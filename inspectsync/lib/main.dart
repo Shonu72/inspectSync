@@ -48,6 +48,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'InspectSync Offline architecture demo',
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.light,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: const LoginScreen(),

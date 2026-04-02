@@ -23,8 +23,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppTheme.background, // Off-white base
+      backgroundColor: colorScheme.surface, // Off-white/Obsidian base
       body: SafeArea(
         child: Column(
           children: [
@@ -38,14 +40,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   Icon(
                     Icons.grid_view_rounded,
-                    color: AppTheme.primary,
+                    color: colorScheme.primary,
                     size: 28,
                   ),
                   const SizedBox(width: 12),
                   Text(
                     AppLocalizations.of(context)?.appTitle ?? "InspectSync",
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: AppTheme.primary,
+                      color: colorScheme.primary,
                       fontWeight: FontWeight.w800,
                       fontSize: 20,
                       letterSpacing: 1.5,
@@ -70,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: AppTheme.surfaceContainerLowest, // Pure white
+                            color: colorScheme.surfaceContainerLowest, // Pure white or Pitch Black
                             borderRadius: BorderRadius.circular(16.0),
                             boxShadow: [
                               BoxShadow(
@@ -96,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Text(
                                   AppLocalizations.of(context)!.loginSubtitle,
                                   style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(color: AppTheme.onSurfaceVariant),
+                                      ?.copyWith(color: colorScheme.onSurfaceVariant),
                                 ),
                               ),
                               const SizedBox(height: 40),
@@ -196,15 +198,15 @@ class _LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(8.0),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppTheme.primary.withOpacity(0.2),
+                                  color: colorScheme.primary.withOpacity(0.12),
                                   blurRadius: 16,
                                   offset: const Offset(0, 8),
                                 ),
                               ],
-                              gradient: const LinearGradient(
+                              gradient: LinearGradient(
                                 colors: [
-                                  AppTheme.primary,
-                                  AppTheme.primaryContainer,
+                                  colorScheme.primary,
+                                  colorScheme.primaryContainer,
                                 ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -244,7 +246,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           // Divider
                           Divider(
-                            color: AppTheme.outlineVariant.withOpacity(0.3),
+                            color: colorScheme.outlineVariant.withOpacity(0.3),
                             height: 1,
                           ),
                           const SizedBox(height: 24),
@@ -257,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 AppLocalizations.of(context)!.dontHaveAccount,
                                 style: Theme.of(context).textTheme.bodyMedium
                                     ?.copyWith(
-                                      color: AppTheme.onSurfaceVariant,
+                                      color: colorScheme.onSurfaceVariant,
                                     ),
                               ),
                               TextButton(
@@ -267,7 +269,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   minimumSize: Size.zero,
                                   tapTargetSize:
                                       MaterialTapTargetSize.shrinkWrap,
-                                  foregroundColor: AppTheme.primary,
+                                  foregroundColor: colorScheme.primary,
                                   textStyle: Theme.of(context)
                                       .textTheme
                                       .labelMedium
@@ -289,7 +291,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         vertical: 10.0,
                       ),
                       decoration: BoxDecoration(
-                        color: AppTheme.surfaceContainer,
+                        color: colorScheme.surfaceContainer,
                         borderRadius: BorderRadius.circular(24.0),
                       ),
                       child: Row(
@@ -299,7 +301,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             width: 8,
                             height: 8,
                             decoration: const BoxDecoration(
-                              color: AppTheme.tertiary,
+                              color: AppTheme.tertiary, // Static success green
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -310,10 +312,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ?.copyWith(letterSpacing: 1.0),
                           ),
                           const SizedBox(width: 8),
-                          const Icon(
+                          Icon(
                             Icons.shield_outlined,
                             size: 14,
-                            color: AppTheme.onSurfaceVariant,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ],
                       ),

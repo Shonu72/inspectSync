@@ -21,6 +21,44 @@ class AppTheme {
 
   static const Color outlineVariant = Color(0xFFC1C6D6); // Ghost Border
 
+  // Common Typography
+  static TextTheme _buildTextTheme(Color onSurface, Color onSurfaceVariant) {
+    return TextTheme(
+      displayMedium: GoogleFonts.manrope(
+        fontSize: 44,
+        fontWeight: FontWeight.w700,
+        color: onSurface,
+        letterSpacing: -0.02,
+      ),
+      headlineLarge: GoogleFonts.manrope(
+        fontSize: 32,
+        fontWeight: FontWeight.w700,
+        color: onSurface,
+      ),
+      headlineMedium: GoogleFonts.manrope(
+        fontSize: 28,
+        fontWeight: FontWeight.w600,
+        color: onSurface,
+      ),
+      bodyMedium: GoogleFonts.inter(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: onSurface,
+      ),
+      labelSmall: GoogleFonts.inter(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: onSurfaceVariant,
+        letterSpacing: 0.05,
+      ),
+      labelMedium: GoogleFonts.inter(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: onSurface,
+      ),
+    );
+  }
+
   // ThemeData
   static ThemeData get lightTheme {
     return ThemeData(
@@ -37,41 +75,8 @@ class AppTheme {
         onSurfaceVariant: onSurfaceVariant,
       ),
       scaffoldBackgroundColor: background,
-      
-      // Typography: Manrope for display/headlines, Inter for body/labels
-      textTheme: TextTheme(
-        displayMedium: GoogleFonts.manrope(
-          fontSize: 44, // 2.75rem
-          fontWeight: FontWeight.w700,
-          color: onSurface,
-          letterSpacing: 0.5,
-        ),
-        headlineLarge: GoogleFonts.manrope(
-          fontSize: 32,
-          fontWeight: FontWeight.w700,
-          color: onSurface,
-        ),
-        headlineMedium: GoogleFonts.manrope(
-          fontSize: 28,
-          fontWeight: FontWeight.w600,
-          color: onSurface,
-        ),
-        bodyMedium: GoogleFonts.inter(
-          fontSize: 14, // 0.875rem
-          fontWeight: FontWeight.w400,
-          color: onSurface, // Keep contrast high for outdoor use
-        ),
-        labelSmall: GoogleFonts.inter(
-          fontSize: 11, // 0.6875rem
-          fontWeight: FontWeight.w500,
-          color: onSurfaceVariant,
-        ),
-        labelMedium: GoogleFonts.inter(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          color: onSurface,
-        ),
-      ),
+      // Typography
+      textTheme: _buildTextTheme(onSurface, onSurfaceVariant),
 
       // Tactical Architect: No 1px lines rule / Tonal Layering
       inputDecorationTheme: InputDecorationTheme(
@@ -102,6 +107,77 @@ class AppTheme {
             borderRadius: BorderRadius.circular(8.0), // "radius lg (0.5rem)"
           ),
           elevation: 0, // Shadows removed in favor of color separation
+        ),
+      ),
+    );
+  }
+
+  // Tactical Architect - The Obsidian Command
+  static ThemeData get darkTheme {
+    const Color darkPrimary = Color(0xFF6B92ED); // Softened from #85ADFF
+    const Color darkPrimaryContainer = Color(0xFF5A84E6); // Softened from #6E9FFF
+    const Color darkOnPrimary = Color(0xFF001B40); // Deepen text on button
+    
+    const Color darkSurface = Color(0xFF060E20);
+    const Color darkSurfaceContainerLow = Color(0xFF091328);
+    const Color darkSurfaceContainer = Color(0xFF0F1930);
+    const Color darkSurfaceContainerHighest = Color(0xFF192540);
+    const Color darkSurfaceContainerLowest = Color(0xFF0B1426); // Softened from #000000
+    
+    const Color darkOnSurface = Color(0xFFC0CAE3); // Softened from #DEE5FF
+    const Color darkOutlineVariant = Color(0xFF40485D);
+
+    return ThemeData(
+      brightness: Brightness.dark,
+      colorScheme: const ColorScheme.dark(
+        primary: darkPrimary,
+        onPrimary: darkOnPrimary,
+        primaryContainer: darkPrimaryContainer,
+        secondary: Color(0xFF40485D),
+        surface: darkSurface,
+        surfaceContainerLow: darkSurfaceContainerLow,
+        surfaceContainer: darkSurfaceContainer,
+        surfaceContainerHighest: darkSurfaceContainerHighest,
+        surfaceContainerLowest: darkSurfaceContainerLowest,
+        error: error,
+        onSurface: darkOnSurface,
+        onSurfaceVariant: darkOutlineVariant, // Using outline variant as secondary text tone
+        outlineVariant: darkOutlineVariant,
+        surfaceTint: darkPrimary,
+      ),
+      scaffoldBackgroundColor: darkSurface,
+
+      textTheme: _buildTextTheme(darkOnSurface, darkOutlineVariant),
+
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: darkSurfaceContainerLow, // Default state input
+        floatingLabelStyle: GoogleFonts.inter(color: darkPrimary, fontWeight: FontWeight.bold),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide.none, // Explicitly no line
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide.none,
+          // Box shadow glow requirement will be handled at the widget level or globally via container since InputDecoration doesn't support boxShadow natively
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide.none,
+        ),
+        errorStyle: const TextStyle(color: error),
+      ),
+
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: darkPrimary, 
+          foregroundColor: darkOnPrimary,
+          minimumSize: const Size(double.infinity, 48),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0), // md (0.375rem)
+          ),
+          elevation: 0,
         ),
       ),
     );
