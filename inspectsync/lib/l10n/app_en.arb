@@ -100,5 +100,69 @@
   "timeWindowLabel": "TIME WINDOW",
   "priorityLabel": "PRIORITY",
   "route": "Route",
-  "startFieldTask": "Start Field Task"
+  "startFieldTask": "Start Field Task",
+  "assignmentStatus": "Assignment Status",
+  "noTasksAssigned": "No tasks assigned",
+  "fieldQueueEmpty": "Your field queue is currently empty. Contact your supervisor or wait for the next scheduled dispatch.",
+  "refreshTasks": "Refresh Tasks",
+  "queueCleared": "Queue Cleared",
+  "lastCheck": "Last check: {time} ago",
+  "@lastCheck": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "queueClearedDesc": "All previous assignments were successfully completed.",
+  "nextUpdate": "Next Update",
+  "nextUpdateDesc": "Automatic sync scheduled for {time} PM local time.",
+  "@nextUpdateDesc": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "noInternet": "No internet connection",
+  "offlineDesc": "You're currently offline. Field Precision will continue to cache your data locally until a connection is restored.",
+  "retryConnection": "Retry Connection",
+  "workOffline": "Work Offline",
+  "offlineModeEnabled": "Offline Mode Enabled",
+  "localCacheActive": "LOCAL CACHE ACTIVE",
+  "syncFailed": "Sync failed",
+  "syncConflictDesc": "We encountered a conflict while uploading your field data to the primary server. Some records require manual review.",
+  "errorDetails": "ERROR DETAILS",
+  "statusCode": "Status Code",
+  "timestamp": "Timestamp",
+  "reason": "Reason",
+  "viewConflicts": "View Conflicts",
+  "taskDetails": "Task Details",
+  "allChangesCached": "ALL CHANGES CACHED LOCALLY",
+  "projectIdLabel": "PROJECT ID: {id}",
+  "@projectIdLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "siteLocation": "Site Location: {location}",
+  "@siteLocation": {
+    "placeholders": {
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+  "technicalChecklist": "Technical Checklist",
+  "fieldDocumentation": "Field Documentation",
+  "fieldNotes": "Field Notes",
+  "notesHint": "Describe any anomalies or specific adjustments made during the inspection...",
+  "dictate": "DICTATE",
+  "addPhoto": "ADD PHOTO",
+  "attachEvidence": "Attach high-resolution evidence of the installation state and completed repairs.",
+  "timeOnSite": "TIME ON SITE",
+  "progress": "PROGRESS",
+  "saveSyncTask": "SAVE & SYNC TASK"
 }

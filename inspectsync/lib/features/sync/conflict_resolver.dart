@@ -12,18 +12,6 @@ class ConflictResolver {
     // For now we assume a conflict is found:
     final conflictExists = false; // Stub
     
-    if (conflictExists) {
-      final localJson = jsonEncode(localPayload);
-      final serverJson = jsonEncode(serverPayload);
-      
-      await _db.into(_db.conflicts).insert(ConflictsCompanion.insert(
-        entityId: entityId,
-        localData: localJson,
-        serverData: serverJson,
-        createdAt: DateTime.now(),
-      ));
-      return true;
-    }
     return false;
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:inspectsync/l10n/app_localizations.dart';
+import 'package:inspectsync/features/tasks/presentation/screens/task_details_screen.dart';
 
 class MapScreen extends StatelessWidget {
   const MapScreen({super.key});
@@ -282,7 +283,12 @@ class MapScreen extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const TaskDetailsScreen()),
+                    );
+                  },
                   icon: const Icon(Icons.play_arrow_rounded),
                   label: Text(l10n.startFieldTask),
                   style: ElevatedButton.styleFrom(

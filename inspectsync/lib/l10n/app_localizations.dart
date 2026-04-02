@@ -345,6 +345,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start Field Task'**
   String get startFieldTask;
+
+  /// No description provided for @assignmentStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Assignment Status'**
+  String get assignmentStatus;
+
+  /// No description provided for @noTasksAssigned.
+  ///
+  /// In en, this message translates to:
+  /// **'No tasks assigned'**
+  String get noTasksAssigned;
+
+  /// No description provided for @fieldQueueEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Your field queue is currently empty. Contact your supervisor or wait for the next scheduled dispatch.'**
+  String get fieldQueueEmpty;
+
+  /// No description provided for @refreshTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh Tasks'**
+  String get refreshTasks;
+
+  /// No description provided for @queueCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Queue Cleared'**
+  String get queueCleared;
+
+  /// No description provided for @lastCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Last check: {time} ago'**
+  String lastCheck(String time);
+
+  /// No description provided for @queueClearedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'All previous assignments were successfully completed.'**
+  String get queueClearedDesc;
+
+  /// No description provided for @nextUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Update'**
+  String get nextUpdate;
+
+  /// No description provided for @nextUpdateDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic sync scheduled for {time} PM local time.'**
+  String nextUpdateDesc(String time);
+
+  /// No description provided for @noInternet.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection'**
+  String get noInternet;
+
+  /// No description provided for @offlineDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re currently offline. Field Precision will continue to cache your data locally until a connection is restored.'**
+  String get offlineDesc;
+
+  /// No description provided for @retryConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry Connection'**
+  String get retryConnection;
+
+  /// No description provided for @workOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Work Offline'**
+  String get workOffline;
+
+  /// No description provided for @offlineModeEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline Mode Enabled'**
+  String get offlineModeEnabled;
+
+  /// No description provided for @localCacheActive.
+  ///
+  /// In en, this message translates to:
+  /// **'LOCAL CACHE ACTIVE'**
+  String get localCacheActive;
+
+  /// No description provided for @syncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync failed'**
+  String get syncFailed;
+
+  /// No description provided for @syncConflictDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'We encountered a conflict while uploading your field data to the primary server. Some records require manual review.'**
+  String get syncConflictDesc;
+
+  /// No description provided for @errorDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'ERROR DETAILS'**
+  String get errorDetails;
+
+  /// No description provided for @statusCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Status Code'**
+  String get statusCode;
+
+  /// No description provided for @timestamp.
+  ///
+  /// In en, this message translates to:
+  /// **'Timestamp'**
+  String get timestamp;
+
+  /// No description provided for @reason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get reason;
+
+  /// No description provided for @viewConflicts.
+  ///
+  /// In en, this message translates to:
+  /// **'View Conflicts'**
+  String get viewConflicts;
+
+  /// No description provided for @taskDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Task Details'**
+  String get taskDetails;
+
+  /// No description provided for @allChangesCached.
+  ///
+  /// In en, this message translates to:
+  /// **'ALL CHANGES CACHED LOCALLY'**
+  String get allChangesCached;
+
+  /// No description provided for @projectIdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'PROJECT ID: {id}'**
+  String projectIdLabel(String id);
+
+  /// No description provided for @siteLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Site Location: {location}'**
+  String siteLocation(String location);
+
+  /// No description provided for @technicalChecklist.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical Checklist'**
+  String get technicalChecklist;
+
+  /// No description provided for @fieldDocumentation.
+  ///
+  /// In en, this message translates to:
+  /// **'Field Documentation'**
+  String get fieldDocumentation;
+
+  /// No description provided for @fieldNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Field Notes'**
+  String get fieldNotes;
+
+  /// No description provided for @notesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe any anomalies or specific adjustments made during the inspection...'**
+  String get notesHint;
+
+  /// No description provided for @dictate.
+  ///
+  /// In en, this message translates to:
+  /// **'DICTATE'**
+  String get dictate;
+
+  /// No description provided for @addPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'ADD PHOTO'**
+  String get addPhoto;
+
+  /// No description provided for @attachEvidence.
+  ///
+  /// In en, this message translates to:
+  /// **'Attach high-resolution evidence of the installation state and completed repairs.'**
+  String get attachEvidence;
+
+  /// No description provided for @timeOnSite.
+  ///
+  /// In en, this message translates to:
+  /// **'TIME ON SITE'**
+  String get timeOnSite;
+
+  /// No description provided for @progress.
+  ///
+  /// In en, this message translates to:
+  /// **'PROGRESS'**
+  String get progress;
+
+  /// No description provided for @saveSyncTask.
+  ///
+  /// In en, this message translates to:
+  /// **'SAVE & SYNC TASK'**
+  String get saveSyncTask;
 }
 
 class _AppLocalizationsDelegate

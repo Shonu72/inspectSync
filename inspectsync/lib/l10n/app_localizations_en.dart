@@ -139,4 +139,126 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get startFieldTask => 'Start Field Task';
+
+  @override
+  String get assignmentStatus => 'Assignment Status';
+
+  @override
+  String get noTasksAssigned => 'No tasks assigned';
+
+  @override
+  String get fieldQueueEmpty =>
+      'Your field queue is currently empty. Contact your supervisor or wait for the next scheduled dispatch.';
+
+  @override
+  String get refreshTasks => 'Refresh Tasks';
+
+  @override
+  String get queueCleared => 'Queue Cleared';
+
+  @override
+  String lastCheck(String time) {
+    return 'Last check: $time ago';
+  }
+
+  @override
+  String get queueClearedDesc =>
+      'All previous assignments were successfully completed.';
+
+  @override
+  String get nextUpdate => 'Next Update';
+
+  @override
+  String nextUpdateDesc(String time) {
+    return 'Automatic sync scheduled for $time PM local time.';
+  }
+
+  @override
+  String get noInternet => 'No internet connection';
+
+  @override
+  String get offlineDesc =>
+      'You\'re currently offline. Field Precision will continue to cache your data locally until a connection is restored.';
+
+  @override
+  String get retryConnection => 'Retry Connection';
+
+  @override
+  String get workOffline => 'Work Offline';
+
+  @override
+  String get offlineModeEnabled => 'Offline Mode Enabled';
+
+  @override
+  String get localCacheActive => 'LOCAL CACHE ACTIVE';
+
+  @override
+  String get syncFailed => 'Sync failed';
+
+  @override
+  String get syncConflictDesc =>
+      'We encountered a conflict while uploading your field data to the primary server. Some records require manual review.';
+
+  @override
+  String get errorDetails => 'ERROR DETAILS';
+
+  @override
+  String get statusCode => 'Status Code';
+
+  @override
+  String get timestamp => 'Timestamp';
+
+  @override
+  String get reason => 'Reason';
+
+  @override
+  String get viewConflicts => 'View Conflicts';
+
+  @override
+  String get taskDetails => 'Task Details';
+
+  @override
+  String get allChangesCached => 'ALL CHANGES CACHED LOCALLY';
+
+  @override
+  String projectIdLabel(String id) {
+    return 'PROJECT ID: $id';
+  }
+
+  @override
+  String siteLocation(String location) {
+    return 'Site Location: $location';
+  }
+
+  @override
+  String get technicalChecklist => 'Technical Checklist';
+
+  @override
+  String get fieldDocumentation => 'Field Documentation';
+
+  @override
+  String get fieldNotes => 'Field Notes';
+
+  @override
+  String get notesHint =>
+      'Describe any anomalies or specific adjustments made during the inspection...';
+
+  @override
+  String get dictate => 'DICTATE';
+
+  @override
+  String get addPhoto => 'ADD PHOTO';
+
+  @override
+  String get attachEvidence =>
+      'Attach high-resolution evidence of the installation state and completed repairs.';
+
+  @override
+  String get timeOnSite => 'TIME ON SITE';
+
+  @override
+  String get progress => 'PROGRESS';
+
+  @override
+  String get saveSyncTask => 'SAVE & SYNC TASK';
 }

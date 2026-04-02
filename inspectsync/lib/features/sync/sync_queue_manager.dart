@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:drift/drift.dart' as drift;
 import '../../../core/db/app_database.dart';
 
@@ -24,11 +23,16 @@ class SyncQueueManager {
     await (_db.delete(_db.syncQueue)..where((q) => q.id.equals(id))).go();
   }
 
-  Future<void> markQueueFailed(int id, int currentRetries) async {
-    await (_db.update(_db.syncQueue)..where((q) => q.id.equals(id)))
-        .write(SyncQueueCompanion(
-          status: const drift.Value('failed'),
-          retryCount: drift.Value(currentRetries + 1),
-        ));
+  Future<bool> markQueueFailed(int id, int currentRetries) async {
+    try {
+      await (_db.update(_db.syncQueue)..where((q) => q.id.equals(id)))
+          .write(SyncQueueCompanion(
+            status: const drift.Value('failed'),
+            retryCount: drift.Value(currentRetries + 1),
+          ));
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

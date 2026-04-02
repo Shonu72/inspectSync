@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inspectsync/l10n/app_localizations.dart';
 import 'package:inspectsync/features/map/presentation/screens/map_screen.dart';
+import 'package:inspectsync/features/tasks/presentation/screens/tasks_screen.dart';
 import 'dashboard_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -16,8 +17,8 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     const DashboardScreen(),
     const MapScreen(),
-    const Center(child: Text('Tasks View')),
-    const Center(child: Text('Settings View')),
+    const TasksScreen(),
+    const Center(child: Text('Sync & Profile View')),
   ];
 
   @override
@@ -40,7 +41,7 @@ class _MainScreenState extends State<MainScreen> {
             _buildNavItem(1, Icons.map_rounded, l10n.bottomNavMap),
             const SizedBox(width: 48), // Space for FAB
             _buildNavItem(2, Icons.assignment_rounded, l10n.bottomNavTasks),
-            _buildNavItem(3, Icons.settings_rounded, l10n.bottomNavSettings),
+            _buildNavItem(3, Icons.sync_rounded, "SYNC"),
           ],
         ),
       ),
