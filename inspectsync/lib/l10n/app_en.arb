@@ -1,0 +1,54 @@
+{
+  "appTitle": "InspectSync",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "welcomeBack": "Welcome Back",
+  "@welcomeBack": {
+    "description": "Greeting shown on the login screen"
+  },
+  "loginSubtitle": "Access your field operations dashboard",
+  "@loginSubtitle": {
+    "description": "Subtitle encouraging user to login"
+  },
+  "emailAddressLabel": "EMAIL ADDRESS",
+  "@emailAddressLabel": {
+    "description": "Label for the email input field"
+  },
+  "emailHint": "name@company.com",
+  "@emailHint": {
+    "description": "Placeholder text for the email input field"
+  },
+  "passwordLabel": "PASSWORD",
+  "@passwordLabel": {
+    "description": "Label for the password input field"
+  },
+  "passwordHint": "••••••••",
+  "@passwordHint": {
+    "description": "Placeholder for the password input field"
+  },
+  "forgotPassword": "Forgot Password?",
+  "@forgotPassword": {
+    "description": "Button text to trigger forgot password flow"
+  },
+  "rememberDevice": "Remember this device",
+  "@rememberDevice": {
+    "description": "Label for the remember me checkbox"
+  },
+  "loginButton": "Log In to Dashboard",
+  "@loginButton": {
+    "description": "Text inside the login button"
+  },
+  "dontHaveAccount": "Don't have an account? ",
+  "@dontHaveAccount": {
+    "description": "Prompt for users without an account"
+  },
+  "contactAdmin": "Contact Admin",
+  "@contactAdmin": {
+    "description": "Button to contact admin for creating an account"
+  },
+  "encryptedSyncActive": "ENCRYPTED SYNC ACTIVE",
+  "@encryptedSyncActive": {
+    "description": "Indicator state showing that sync is active and encrypted"
+  }
+}

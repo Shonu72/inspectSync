@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:inspectsync/l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
-
 import 'core/db/app_database.dart';
+import 'core/theme/app_theme.dart';
+import 'features/auth/presentation/screens/login_screen.dart';
 import 'features/sync/conflict_resolver.dart';
 import 'features/sync/sync_queue_manager.dart';
 import 'features/sync/sync_service.dart';
@@ -45,11 +47,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'InspectSync Offline architecture demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: TasksScreen(repository: taskRepository),
+      theme: AppTheme.lightTheme,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: const LoginScreen(),
     );
   }
 }

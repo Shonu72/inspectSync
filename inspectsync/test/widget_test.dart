@@ -35,6 +35,6 @@ void main() {
 
     await tester.pumpWidget(MyApp(taskRepository: taskRepository));
 
-    expect(find.text('Tasks Sync Demo'), findsOneWidget);
+    expect(find.text('Welcome Back'), findsOneWidget);
   });
 }
