@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inspectsync/l10n/app_localizations.dart';
+import '../../../dashboard/presentation/screens/main_screen.dart';
 import '../../../../core/theme/app_theme.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -213,7 +214,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const MainScreen()),
+                                );
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.transparent,
                                 shadowColor: Colors.transparent,

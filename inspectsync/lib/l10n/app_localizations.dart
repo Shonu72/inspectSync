@@ -171,6 +171,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'ENCRYPTED SYNC ACTIVE'**
   String get encryptedSyncActive;
+
+  /// No description provided for @bottomNavDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'DASHBOARD'**
+  String get bottomNavDashboard;
+
+  /// No description provided for @bottomNavMap.
+  ///
+  /// In en, this message translates to:
+  /// **'MAP'**
+  String get bottomNavMap;
+
+  /// No description provided for @bottomNavTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'TASKS'**
+  String get bottomNavTasks;
+
+  /// No description provided for @bottomNavSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'SETTINGS'**
+  String get bottomNavSettings;
+
+  /// No description provided for @precisionField.
+  ///
+  /// In en, this message translates to:
+  /// **'Precision Field'**
+  String get precisionField;
+
+  /// No description provided for @allLocalDataSynchronized.
+  ///
+  /// In en, this message translates to:
+  /// **'All local data synchronized'**
+  String get allLocalDataSynchronized;
+
+  /// No description provided for @lastUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'LAST UPDATE: {time} AGO'**
+  String lastUpdate(String time);
+
+  /// No description provided for @activeOperations.
+  ///
+  /// In en, this message translates to:
+  /// **'ACTIVE OPERATIONS'**
+  String get activeOperations;
+
+  /// No description provided for @taskUnitsRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Task Units'**
+  String taskUnitsRemaining(int count);
+
+  /// No description provided for @remaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining'**
+  String get remaining;
+
+  /// No description provided for @listTab.
+  ///
+  /// In en, this message translates to:
+  /// **'List'**
+  String get listTab;
+
+  /// No description provided for @mapTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get mapTab;
+
+  /// No description provided for @synced.
+  ///
+  /// In en, this message translates to:
+  /// **'SYNCED'**
+  String get synced;
+
+  /// No description provided for @failed.
+  ///
+  /// In en, this message translates to:
+  /// **'FAILED'**
+  String get failed;
+
+  /// No description provided for @pending.
+  ///
+  /// In en, this message translates to:
+  /// **'PENDING'**
+  String get pending;
+
+  /// No description provided for @inProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'IN PROGRESS'**
+  String get inProgress;
+
+  /// No description provided for @retrySync.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry Sync'**
+  String get retrySync;
+
+  /// No description provided for @continueTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue Task'**
+  String get continueTask;
+
+  /// No description provided for @dailyVelocity.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Velocity'**
+  String get dailyVelocity;
+
+  /// No description provided for @target.
+  ///
+  /// In en, this message translates to:
+  /// **'Target'**
+  String get target;
+
+  /// No description provided for @achieved.
+  ///
+  /// In en, this message translates to:
+  /// **'Achieved'**
+  String get achieved;
+
+  /// No description provided for @systemHealthy.
+  ///
+  /// In en, this message translates to:
+  /// **'System healthy. Next automated sync cycle in {minutes} minutes.'**
+  String systemHealthy(int minutes);
 }
 
 class _AppLocalizationsDelegate

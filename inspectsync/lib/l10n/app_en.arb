@@ -50,5 +50,48 @@
   "encryptedSyncActive": "ENCRYPTED SYNC ACTIVE",
   "@encryptedSyncActive": {
     "description": "Indicator state showing that sync is active and encrypted"
+  },
+  "bottomNavDashboard": "DASHBOARD",
+  "bottomNavMap": "MAP",
+  "bottomNavTasks": "TASKS",
+  "bottomNavSettings": "SETTINGS",
+  "precisionField": "Precision Field",
+  "allLocalDataSynchronized": "All local data synchronized",
+  "lastUpdate": "LAST UPDATE: {time} AGO",
+  "@lastUpdate": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "activeOperations": "ACTIVE OPERATIONS",
+  "taskUnitsRemaining": "{count} Task Units",
+  "@taskUnitsRemaining": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "remaining": "Remaining",
+  "listTab": "List",
+  "mapTab": "Map",
+  "synced": "SYNCED",
+  "failed": "FAILED",
+  "pending": "PENDING",
+  "inProgress": "IN PROGRESS",
+  "retrySync": "Retry Sync",
+  "continueTask": "Continue Task",
+  "dailyVelocity": "Daily Velocity",
+  "target": "Target",
+  "achieved": "Achieved",
+  "systemHealthy": "System healthy. Next automated sync cycle in {minutes} minutes.",
+  "@systemHealthy": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
   }
 }

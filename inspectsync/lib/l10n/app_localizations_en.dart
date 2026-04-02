@@ -46,4 +46,76 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get encryptedSyncActive => 'ENCRYPTED SYNC ACTIVE';
+
+  @override
+  String get bottomNavDashboard => 'DASHBOARD';
+
+  @override
+  String get bottomNavMap => 'MAP';
+
+  @override
+  String get bottomNavTasks => 'TASKS';
+
+  @override
+  String get bottomNavSettings => 'SETTINGS';
+
+  @override
+  String get precisionField => 'Precision Field';
+
+  @override
+  String get allLocalDataSynchronized => 'All local data synchronized';
+
+  @override
+  String lastUpdate(String time) {
+    return 'LAST UPDATE: $time AGO';
+  }
+
+  @override
+  String get activeOperations => 'ACTIVE OPERATIONS';
+
+  @override
+  String taskUnitsRemaining(int count) {
+    return '$count Task Units';
+  }
+
+  @override
+  String get remaining => 'Remaining';
+
+  @override
+  String get listTab => 'List';
+
+  @override
+  String get mapTab => 'Map';
+
+  @override
+  String get synced => 'SYNCED';
+
+  @override
+  String get failed => 'FAILED';
+
+  @override
+  String get pending => 'PENDING';
+
+  @override
+  String get inProgress => 'IN PROGRESS';
+
+  @override
+  String get retrySync => 'Retry Sync';
+
+  @override
+  String get continueTask => 'Continue Task';
+
+  @override
+  String get dailyVelocity => 'Daily Velocity';
+
+  @override
+  String get target => 'Target';
+
+  @override
+  String get achieved => 'Achieved';
+
+  @override
+  String systemHealthy(int minutes) {
+    return 'System healthy. Next automated sync cycle in $minutes minutes.';
+  }
 }
