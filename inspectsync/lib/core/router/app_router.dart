@@ -11,6 +11,7 @@ import '../../features/sync/presentation/screens/sync_status_screen.dart';
 import '../../features/sync/presentation/screens/conflict_resolution_screen.dart';
 import '../../features/tasks/presentation/screens/task_details_screen.dart';
 import '../../features/tasks/presentation/screens/create_task_screen.dart';
+import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../db/app_database.dart';
 
 class AppRouter {
@@ -19,6 +20,7 @@ class AppRouter {
   static const String login = '/';
   static const String dashboard = '/dashboard';
   static const String sync = '/sync';
+  static const String profile = '/profile';
   static const String taskDetails = '/task-details';
   static const String createTask = '/create-task';
   static const String conflictResolution = '/sync/conflict/:id';
@@ -46,6 +48,10 @@ class AppRouter {
         GoRoute(
           path: dashboard,
           builder: (context, state) => MainScreen(syncController: syncController),
+        ),
+        GoRoute(
+          path: profile,
+          builder: (context, state) => const ProfileScreen(),
         ),
         GoRoute(
           path: sync,

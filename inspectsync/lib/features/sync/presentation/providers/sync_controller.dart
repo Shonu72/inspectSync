@@ -11,6 +11,7 @@ class SyncController extends ChangeNotifier {
   final AppDatabase _db;
   final ConnectivityService connectivityService;
 
+  bool _manualOffline = false;
   SyncProgress? _currentProgress;
   List<SyncQueueData> _pendingItems = [];
   Map<String, Conflict> _conflicts = {};
@@ -36,9 +37,21 @@ class SyncController extends ChangeNotifier {
   SyncProgress? get progress => _currentProgress;
   bool get isSyncing => _currentProgress?.isSyncing ?? false;
   List<SyncQueueData> get pendingItems => _pendingItems;
-  bool get isOnline => connectivityService.isOnline;
-  bool get isOffline => connectivityService.isOffline;
-  ConnectivityStatus get connectivityStatus => connectivityService.status;
+  bool get isOnline => !_manualOffline && connectivityService.isOnline;
+  bool get isOffline => _manualOffline || connectivityService.isOffline;
+  bool get isManualOffline => _manualOffline;
+  ConnectivityStatus get connectivityStatus => _manualOffline ? ConnectivityStatus.offline : connectivityService.status;
+
+  void setManualOffline(bool value) {
+    _manualOffline = value;
+    notifyListeners();
+    if (value) {
+      debugPrint('SyncController: Manual offline mode engaged');
+    } else {
+      debugPrint('SyncController: Manual offline mode disengaged');
+      _onConnectivityChanged(); // Re-check if we should sync now
+    }
+  }
 
   void _onConnectivityChanged() {
     // When we come back online, auto-trigger a sync if there are pending items

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inspectsync/l10n/app_localizations.dart';
 import 'package:inspectsync/features/sync/presentation/providers/sync_controller.dart';
+import 'package:inspectsync/features/auth/presentation/bloc/auth_cubit.dart';
+import 'package:inspectsync/features/auth/presentation/bloc/auth_state.dart';
 import '../../../tasks/presentation/widgets/task_card.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -59,19 +62,40 @@ class DashboardScreen extends StatelessWidget {
                 icon: const Icon(Icons.search),
                 onPressed: () {},
               ),
-              Padding(
-                padding: const EdgeInsets.only(right: 16.0),
-                child: CircleAvatar(
-                  radius: 16,
-                  backgroundColor: colorScheme.primary,
-                  child: Text(
-                    'JD',
-                    style: TextStyle(
-                      color: colorScheme.onPrimary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+              InkWell(
+                onTap: () => context.push('/profile'),
+                borderRadius: BorderRadius.circular(16),
+                child: BlocBuilder<AuthCubit, AuthState>(
+                  builder: (context, state) {
+                    String initials = 'JD'; // Default
+                    if (state is AuthAuthenticated) {
+                      final name = state.user.name;
+                      if (name != null && name.isNotEmpty) {
+                        final names = name.split(' ');
+                        initials = names
+                            .where((n) => n.isNotEmpty)
+                            .map((n) => n[0])
+                            .take(2)
+                            .join()
+                            .toUpperCase();
+                      }
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: CircleAvatar(
+                        radius: 16,
+                        backgroundColor: colorScheme.primary,
+                        child: Text(
+                          initials,
+                          style: TextStyle(
+                            color: colorScheme.onPrimary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
