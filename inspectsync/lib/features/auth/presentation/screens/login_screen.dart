@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/services/toast_service.dart';
+import '../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -97,83 +99,116 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ],
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'IDENTIFICATION',
-                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            TextField(
-                              controller: _emailController,
-                              decoration: InputDecoration(
-                                hintText: 'Enter corporate email',
-                                prefixIcon: const Icon(Icons.badge_outlined),
-                                filled: true,
-                                fillColor: colorScheme.surface,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            Text(
-                              'ACCESS TOKEN',
-                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            TextField(
-                              controller: _passwordController,
-                              obscureText: true,
-                              decoration: InputDecoration(
-                                hintText: 'Enter secret key',
-                                prefixIcon: const Icon(Icons.key_outlined),
-                                filled: true,
-                                fillColor: colorScheme.surface,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 32),
-                            
-                            // Action Button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 56,
-                              child: ElevatedButton(
-                                onPressed: () => context.go('/dashboard'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: colorScheme.primary,
-                                  foregroundColor: colorScheme.onPrimary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                        child: Consumer<AuthProvider>(
+                          builder: (context, auth, _) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'IDENTIFICATION',
+                                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  elevation: 0,
                                 ),
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'AUTHORIZE ACCESS',
-                                      style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.1),
+                                const SizedBox(height: 12),
+                                TextField(
+                                  controller: _emailController,
+                                  keyboardType: TextInputType.emailAddress,
+                                  decoration: InputDecoration(
+                                    hintText: 'Enter corporate email',
+                                    prefixIcon: const Icon(Icons.badge_outlined),
+                                    filled: true,
+                                    fillColor: colorScheme.surface,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
                                     ),
-                                    SizedBox(width: 8),
-                                    Icon(Icons.vpn_key, size: 18),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
+                                const SizedBox(height: 24),
+                                Text(
+                                  'ACCESS TOKEN',
+                                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                TextField(
+                                  controller: _passwordController,
+                                  obscureText: true,
+                                  decoration: InputDecoration(
+                                    hintText: 'Enter secret key',
+                                    prefixIcon: const Icon(Icons.key_outlined),
+                                    filled: true,
+                                    fillColor: colorScheme.surface,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                  ),
+                                ),
+                                
+                                if (auth.errorMessage != null) ...[
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    auth.errorMessage!,
+                                    style: TextStyle(color: colorScheme.error, fontSize: 12),
+                                  ),
+                                ],
+                                
+                                const SizedBox(height: 32),
+                                
+                                // Action Button
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 56,
+                                  child: ElevatedButton(
+                                    onPressed: auth.isAuthenticating 
+                                      ? null 
+                                      : () async {
+                                          final success = await auth.login(
+                                            _emailController.text,
+                                            _passwordController.text,
+                                          );
+                                          if (!success) {
+                                            ToastService.showError(auth.errorMessage ?? 'Authentication Failed');
+                                          }
+                                        },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: colorScheme.primary,
+                                      foregroundColor: colorScheme.onPrimary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      elevation: 0,
+                                    ),
+                                    child: auth.isAuthenticating
+                                      ? const SizedBox(
+                                          height: 20,
+                                          width: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : const Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'AUTHORIZE ACCESS',
+                                              style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.1),
+                                            ),
+                                            SizedBox(width: 8),
+                                            Icon(Icons.vpn_key, size: 18),
+                                          ],
+                                        ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
                         ),
                       ),
                       
