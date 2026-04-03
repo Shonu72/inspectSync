@@ -286,7 +286,7 @@ class MapScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const TaskDetailsScreen()),
+                      MaterialPageRoute(builder: (context) => const TaskDetailsScreen(taskId: 'TSK-402')),
                     );
                   },
                   icon: const Icon(Icons.play_arrow_rounded),

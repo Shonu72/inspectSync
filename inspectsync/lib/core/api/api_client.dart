@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:talker/talker.dart';
 import 'package:talker_dio_logger/talker_dio_logger_interceptor.dart';
 import 'api_endpoints.dart';
 import 'interceptors/auth_interceptor.dart';
@@ -10,6 +11,7 @@ class ApiClient {
   ApiClient({
     required this.dio,
     required AuthInterceptor authInterceptor,
+    required Talker talker,
   }) {
     dio.options.baseUrl = baseUrl;
     dio.options.connectTimeout = const Duration(seconds: 10);
@@ -17,7 +19,7 @@ class ApiClient {
 
     dio.interceptors.addAll([
       authInterceptor,
-      TalkerDioLogger(),
+      TalkerDioLogger(talker: talker),
     ]);
   }
 

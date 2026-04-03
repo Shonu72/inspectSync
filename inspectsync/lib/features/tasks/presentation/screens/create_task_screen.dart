@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:inspectsync/features/tasks/data/task_repository.dart';
+import 'package:inspectsync/core/services/toast_service.dart';
 
 class CreateTaskScreen extends StatefulWidget {
   const CreateTaskScreen({super.key});
@@ -12,7 +15,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   final _descriptionController = TextEditingController();
   final _locationController = TextEditingController(text: 'Zone 04 - Sector B');
   
-  int _selectedPriority = 0; // 0=High, 1=Medium, 2=Low
+  int _selectedPriority = 1; // Default to Medium
   String _selectedCategory = 'Field Maintenance';
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = const TimeOfDay(hour: 8, minute: 0);
@@ -31,6 +34,27 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     _descriptionController.dispose();
     _locationController.dispose();
     super.dispose();
+  }
+
+  void _saveTask() async {
+    final title = _titleController.text.trim();
+    if (title.isEmpty) {
+      ToastService.showError('Task title is required');
+      return;
+    }
+
+    try {
+      await GetIt.I<TaskRepository>().createTask(
+        title: title,
+        description: _descriptionController.text.trim(),
+        // Repository handles default priority and versioning
+      );
+
+      ToastService.showSuccess('Task created and queued for sync');
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      ToastService.showError('Failed to create task locally');
+    }
   }
 
   @override
@@ -579,25 +603,5 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       initialTime: _selectedTime,
     );
     if (picked != null) setState(() => _selectedTime = picked);
-  }
-
-  void _saveTask() {
-    if (_titleController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Task title is required'),
-          backgroundColor: Color(0xFFD32F2F),
-        ),
-      );
-      return;
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Operation initialized — queued for sync'),
-        backgroundColor: Color(0xFF388E3C),
-      ),
-    );
-    Navigator.pop(context);
   }
 }

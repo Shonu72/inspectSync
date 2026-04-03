@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
+import '../util/logger.dart';
 
 /// Provides real connectivity status by combining [Connectivity] (network interface)
 /// with an actual HTTP reachability check (DNS lookup).
@@ -19,10 +20,13 @@ class ConnectivityService extends ChangeNotifier {
   Timer? _periodicCheck;
 
   ConnectivityStatus _status = ConnectivityStatus.unknown;
-  ConnectivityStatus get status => _status;
+  ConnectivityStatus get status => _isManualOffline ? ConnectivityStatus.offline : _status;
 
-  bool get isOnline => _status == ConnectivityStatus.online;
-  bool get isOffline => _status == ConnectivityStatus.offline;
+  bool _isManualOffline = false;
+  bool get isManualOffline => _isManualOffline;
+
+  bool get isOnline => !_isManualOffline && _status == ConnectivityStatus.online;
+  bool get isOffline => _isManualOffline || _status == ConnectivityStatus.offline;
 
   final _statusController = StreamController<ConnectivityStatus>.broadcast();
   Stream<ConnectivityStatus> get statusStream => _statusController.stream;
@@ -85,18 +89,36 @@ class ConnectivityService extends ChangeNotifier {
       _updateStatus(ConnectivityStatus.offline);
       return false;
     } catch (e) {
-      debugPrint('ConnectivityService: unexpected error: $e');
+      AppLogger.error('ConnectivityService: unexpected error: $e');
       _updateStatus(ConnectivityStatus.offline);
       return false;
+    }
+  }
+
+  void setManualOffline(bool value) {
+    if (_isManualOffline != value) {
+      _isManualOffline = value;
+      notifyListeners();
+      _statusController.add(status);
+      if (value) {
+        AppLogger.warning('ConnectivityService: MANUAL OFFLINE MODE ENGAGED');
+      } else {
+        AppLogger.success('ConnectivityService: MANUAL OFFLINE MODE DISENGAGED');
+        checkNow(); // Re-verify actual connection when toggle is off
+      }
     }
   }
 
   void _updateStatus(ConnectivityStatus newStatus) {
     if (_status != newStatus) {
       _status = newStatus;
-      _statusController.add(newStatus);
+      _statusController.add(status); // Use logical status
       notifyListeners();
-      debugPrint('ConnectivityService: status changed → $newStatus');
+      if (newStatus == ConnectivityStatus.online) {
+        AppLogger.success('ConnectivityService: Network protocol established (ONLINE)');
+      } else {
+        AppLogger.warning('ConnectivityService: Network interface disconnected (OFFLINE)');
+      }
     }
   }
 

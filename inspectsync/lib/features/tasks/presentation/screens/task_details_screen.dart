@@ -1,15 +1,22 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:inspectsync/l10n/app_localizations.dart';
+import '../../data/task_repository.dart';
+import '../../../../core/db/app_database.dart';
 
 class TaskDetailsScreen extends StatefulWidget {
-  const TaskDetailsScreen({super.key});
+  final String taskId;
+  const TaskDetailsScreen({super.key, required this.taskId});
 
   @override
   State<TaskDetailsScreen> createState() => _TaskDetailsScreenState();
 }
 
 class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
-  final List<bool> _checklistValues = [false, true, false, false];
+  late final Stream<DateTime> _timerStream;
+  late final ValueNotifier<List<bool>> _checklistNotifier;
+  
   final List<String> _checklistItems = [
     "Verify casing integrity",
     "Measure input voltage levels",
@@ -18,185 +25,202 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _timerStream = Stream.periodic(const Duration(seconds: 1), (_) => DateTime.now()).asBroadcastStream();
+    _checklistNotifier = ValueNotifier<List<bool>>([false, true, false, false]);
+  }
+
+  @override
+  void dispose() {
+    _checklistNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        backgroundColor: colorScheme.surface,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.close_rounded),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.green.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.lock_outline, size: 10, color: Colors.green),
-                  SizedBox(width: 4),
-                  Text(
-                    'ENCRYPTED SESSION',
-                    style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.green, letterSpacing: 1.0),
-                  ),
-                ],
-              ),
+    return FutureBuilder<Task?>(
+      future: GetIt.I<TaskRepository>().getTaskById(widget.taskId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            backgroundColor: colorScheme.surface,
+            body: const Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final task = snapshot.data;
+        if (task == null) {
+          return Scaffold(
+            backgroundColor: colorScheme.surface,
+            appBar: AppBar(title: const Text("NOT FOUND")),
+            body: const Center(child: Text("Operational directive not found in local cache.")),
+          );
+        }
+
+        return Scaffold(
+          backgroundColor: colorScheme.surface,
+          appBar: AppBar(
+            backgroundColor: colorScheme.surface,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.close_rounded),
+              onPressed: () => Navigator.pop(context),
             ),
-            const SizedBox(height: 4),
-            Text(l10n.taskDetails.toUpperCase(), 
-              style: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1.2),
-            ),
-          ],
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(icon: const Icon(Icons.more_vert_rounded), onPressed: () {}),
-        ],
-      ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 140),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            title: Column(
               children: [
-                // 1. Mission Header
-                _buildMissionHeader(context, l10n),
-                
-                // 2. Technical Checklist
-                _buildSection(
-                  context,
-                  title: 'OPERATIONAL CHECKLIST',
-                  icon: Icons.checklist_rtl_rounded,
-                  child: Column(
-                    children: List.generate(_checklistItems.length, (index) {
-                      return _buildChecklistItem(context, index);
-                    }),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
                   ),
-                ),
-                
-                // 3. Field Evidence (Photos)
-                _buildSection(
-                  context,
-                  title: 'FIELD EVIDENCE',
-                  icon: Icons.camera_enhance_rounded,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: AspectRatio(
-                              aspectRatio: 1,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  image: const DecorationImage(
-                                    image: NetworkImage('https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=400&fit=crop'),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                child: Stack(
-                                  children: [
-                                    Positioned(
-                                      top: 8,
-                                      right: 8,
-                                      child: CircleAvatar(
-                                        radius: 12,
-                                        backgroundColor: Colors.black.withValues(alpha: 0.5),
-                                        child: const Icon(Icons.delete_outline, color: Colors.white, size: 14),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: AspectRatio(
-                              aspectRatio: 1,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: colorScheme.surfaceContainer,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.add_a_photo_rounded, color: colorScheme.primary, size: 32),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      'CAPTURE DATA',
-                                      style: TextStyle(
-                                        color: colorScheme.primary,
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 1.0,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                      Icon(Icons.lock_outline, size: 10, color: Colors.green),
+                      SizedBox(width: 4),
+                      Text(
+                        'ENCRYPTED SESSION',
+                        style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.green, letterSpacing: 1.0),
                       ),
                     ],
                   ),
                 ),
-                
-                // 4. Tactical Notes
-                _buildSection(
-                  context,
-                  title: 'TACTICAL NOTES',
-                  icon: Icons.notes_rounded,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainer,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: TextField(
-                      maxLines: 4,
-                      style: textTheme.bodyMedium,
-                      decoration: InputDecoration(
-                        hintText: 'Record site observations...',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
-                      ),
-                    ),
-                  ),
+                const SizedBox(height: 4),
+                Text(l10n.taskDetails.toUpperCase(), 
+                  style: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1.2),
                 ),
               ],
             ),
+            centerTitle: true,
+            actions: [
+              IconButton(icon: const Icon(Icons.more_vert_rounded), onPressed: () {}),
+            ],
           ),
-          
-          // Sticky Tactical Footer
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: _buildTacticalFooter(context, l10n),
+          body: Stack(
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 140),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 1. Mission Header
+                    _buildMissionHeader(context, task, l10n),
+                    
+                    // 2. Technical Checklist
+                    _buildSection(
+                      context,
+                      title: 'OPERATIONAL CHECKLIST',
+                      icon: Icons.checklist_rtl_rounded,
+                      child: ValueListenableBuilder<List<bool>>(
+                        valueListenable: _checklistNotifier,
+                        builder: (context, checklist, _) {
+                          return Column(
+                            children: List.generate(_checklistItems.length, (index) {
+                              return _buildChecklistItem(context, index, checklist[index]);
+                            }),
+                          );
+                        },
+                      ),
+                    ),
+                    
+                    // 3. Field Evidence (Photos)
+                    _buildSection(
+                      context,
+                      title: 'FIELD EVIDENCE',
+                      icon: Icons.camera_enhance_rounded,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: AspectRatio(
+                                  aspectRatio: 1,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      image: const DecorationImage(
+                                        image: NetworkImage('https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=400&fit=crop'),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    child: Stack(
+                                      children: [
+                                        Positioned(
+                                          top: 8,
+                                          right: 8,
+                                          child: CircleAvatar(
+                                            radius: 12,
+                                            backgroundColor: Colors.black.withValues(alpha: 0.5),
+                                            child: const Icon(Icons.delete_outline, color: Colors.white, size: 14),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              const Expanded(
+                                child: AspectRatio(
+                                  aspectRatio: 1,
+                                  child: Placeholder(), // Simplified for now
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // 4. Tactical Notes
+                    _buildSection(
+                      context,
+                      title: 'TACTICAL NOTES',
+                      icon: Icons.notes_rounded,
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: colorScheme.surfaceContainer,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: TextField(
+                          maxLines: 4,
+                          style: textTheme.bodyMedium,
+                          decoration: InputDecoration(
+                            hintText: task.description ?? 'No site protocol found.',
+                            border: InputBorder.none,
+                            hintStyle: TextStyle(color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Sticky Tactical Footer
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: _buildTacticalFooter(context, l10n, task),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      }
     );
   }
 
-  Widget _buildMissionHeader(BuildContext context, AppLocalizations l10n) {
+  Widget _buildMissionHeader(BuildContext context, Task task, AppLocalizations l10n) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -222,15 +246,15 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 ),
               ),
               const SizedBox(width: 8),
-              const Text(
-                '#OPS-2024-99X',
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+              Text(
+                '#OPS-${task.id.substring(0, 8).toUpperCase()}',
+                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
               ),
             ],
           ),
           const SizedBox(height: 12),
           Text(
-            "Fiber Backbone\nAudit & Routing",
+            task.title.toUpperCase(),
             style: textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.w900,
               height: 1.1,
@@ -243,7 +267,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
               Icon(Icons.location_on, size: 14, color: colorScheme.onSurfaceVariant),
               const SizedBox(width: 4),
               Text(
-                "SECTOR 7G - NORTHERN POWER GRID",
+                task.lat != null ? "COORDINATES: ${task.lat}, ${task.lng}" : "LOCATION DATA UNKNOWN",
                 style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 10, fontWeight: FontWeight.bold),
               ),
             ],
@@ -277,12 +301,15 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
   }
 
-  Widget _buildChecklistItem(BuildContext context, int index) {
+  Widget _buildChecklistItem(BuildContext context, int index, bool isDone) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isDone = _checklistValues[index];
     
     return GestureDetector(
-      onTap: () => setState(() => _checklistValues[index] = !_checklistValues[index]),
+      onTap: () {
+        final current = List<bool>.from(_checklistNotifier.value);
+        current[index] = !current[index];
+        _checklistNotifier.value = current;
+      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(16),
@@ -316,10 +343,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
   }
 
-  Widget _buildTacticalFooter(BuildContext context, AppLocalizations l10n) {
+  Widget _buildTacticalFooter(BuildContext context, AppLocalizations l10n, Task task) {
     final colorScheme = Theme.of(context).colorScheme;
-    final completedCount = _checklistValues.where((v) => v).length;
-    final percent = (completedCount / _checklistItems.length * 100).toInt();
 
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
@@ -340,11 +365,30 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           Row(
             children: [
               Expanded(
-                child: _buildMetricTile('ELAPSED', '02:14:05', Icons.timer_outlined, colorScheme.primary),
+                child: StreamBuilder<DateTime>(
+                  stream: _timerStream,
+                  builder: (context, snapshot) {
+                    final now = snapshot.data ?? DateTime.now();
+                    final duration = now.difference(task.createdAt);
+                    final hours = duration.inHours.toString().padLeft(2, '0');
+                    final minutes = (duration.inMinutes % 60).toString().padLeft(2, '0');
+                    final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+                    final elapsedStr = "$hours:$minutes:$seconds";
+                    
+                    return _buildMetricTile('ELAPSED', elapsedStr, Icons.timer_outlined, colorScheme.primary);
+                  },
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildMetricTile('PROGRESS', '$percent%', Icons.analytics_outlined, Colors.orange),
+                child: ValueListenableBuilder<List<bool>>(
+                  valueListenable: _checklistNotifier,
+                  builder: (context, checklist, _) {
+                    final completedCount = checklist.where((v) => v).length;
+                    final percent = (completedCount / _checklistItems.length * 100).toInt();
+                    return _buildMetricTile('PROGRESS', '$percent%', Icons.analytics_outlined, Colors.orange);
+                  },
+                ),
               ),
             ],
           ),

@@ -1,5 +1,11 @@
+import 'package:dio/dio.dart';
+import 'package:talker/talker.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
+import 'package:inspectsync/core/api/api_client.dart';
+import 'package:inspectsync/core/api/interceptors/auth_interceptor.dart';
 
 import 'package:inspectsync/main.dart';
 import 'package:inspectsync/features/auth/presentation/screens/login_screen.dart';
@@ -20,18 +26,31 @@ void main() {
   testWidgets('Offline architecture stub test', (WidgetTester tester) async {
     final db = AppDatabase();
     final localTaskDs = TaskLocalDataSource(db);
-    final remoteTaskDs = TaskRemoteDataSource();
+    
+    // Fixed: Pass required api client dependency for tests
+    final remoteTaskDs = TaskRemoteDataSource(
+      apiClient: ApiClient(
+        dio: Dio(), 
+        authInterceptor: AuthInterceptor(storage: const FlutterSecureStorage()),
+        talker: Talker(),
+      ),
+    );
+    
     final queueManager = SyncQueueManager(db);
     final conflictResolver = ConflictResolver(db);
 
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+
+    final connectivityService = ConnectivityService();
     final syncService = SyncService(
       queueManager: queueManager,
       remote: remoteTaskDs,
       local: localTaskDs,
       conflictResolver: conflictResolver,
+      connectivityService: connectivityService,
+      prefs: prefs,
     );
-
-    final connectivityService = ConnectivityService();
     final syncController = SyncController(
       syncService,
       queueManager,

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get_it/get_it.dart';
 import 'package:inspectsync/l10n/app_localizations.dart';
 import 'package:inspectsync/features/sync/presentation/providers/sync_controller.dart';
 import 'package:inspectsync/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:inspectsync/features/auth/presentation/bloc/auth_state.dart';
-import '../../../tasks/presentation/widgets/task_card.dart';
+import 'package:inspectsync/features/tasks/data/task_repository.dart';
+import 'package:inspectsync/features/tasks/presentation/widgets/task_card.dart';
+import 'package:inspectsync/core/db/app_database.dart';
 
 class DashboardScreen extends StatelessWidget {
   final SyncController syncController;
@@ -192,130 +195,113 @@ class DashboardScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      if (hasPending || syncController.isSyncing)
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: l10n.taskUnitsRemaining(syncController.pendingItems.length),
-                                style: textTheme.headlineMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: colorScheme.onSurface,
-                                ),
+                      
+                      // Task Management Logic
+                      StreamBuilder<List<Task>>(
+                        stream: GetIt.I<TaskRepository>().watchTasks(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: Padding(
+                              padding: EdgeInsets.all(24.0),
+                              child: CircularProgressIndicator(),
+                            ));
+                          }
+
+                          final tasks = snapshot.data ?? [];
+                          final syncedCount = tasks.where((t) => t.isSynced).length;
+                          final totalCount = tasks.length;
+                          
+                          if (tasks.isEmpty) {
+                            return Center(
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 24),
+                                  Icon(Icons.check_circle_outline, size: 64, color: colorScheme.primary.withValues(alpha: 0.2)),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    "Queue Cleared",
+                                    style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    "All field documentation is synced with command.",
+                                    textAlign: TextAlign.center,
+                                    style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                                  ),
+                                ],
                               ),
-                              TextSpan(
-                                text: ' ${l10n.remaining.toLowerCase()}',
-                                style: textTheme.headlineMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: colorScheme.primary,
+                            );
+                          }
+
+                          return Column(
+                            key: ValueKey(tasks.length),
+                            children: [
+                              ...tasks.take(3).map((Task t) {
+                                return TaskCard(
+                                  title: t.title,
+                                  subtitle: t.description ?? 'No protocol specified',
+                                  time: "${t.updatedAt.hour}:${t.updatedAt.minute.toString().padLeft(2, '0')}",
+                                  status: t.isSynced ? TaskStatus.synced : TaskStatus.pending,
+                                  priority: TaskPriority.medium,
+                                  onTap: () => context.push('/task/${t.id}'),
+                                );
+                              }),
+                              
+                              const SizedBox(height: 24),
+                              // List/Map Toggle
+                              Row(
+                                children: [
+                                  _buildToggleButton(context, l10n.listTab, Icons.list, true),
+                                  const SizedBox(width: 8),
+                                  _buildToggleButton(context, l10n.mapTab, Icons.map, false),
+                                ],
+                              ),
+                              const SizedBox(height: 24),
+                              
+                              // Daily Velocity Card (Dynamic)
+                              Container(
+                                padding: const EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.surfaceContainerLowest,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.2)),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      l10n.dailyVelocity,
+                                      style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    _buildVelocityRow(context, "TOTAL ASSIGNMENTS", '$totalCount', colorScheme.onSurfaceVariant),
+                                    const SizedBox(height: 12),
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(4),
+                                      child: LinearProgressIndicator(
+                                        value: totalCount > 0 ? syncedCount / totalCount : 0,
+                                        backgroundColor: colorScheme.outlineVariant.withValues(alpha: 0.2),
+                                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.greenAccent),
+                                        minHeight: 8,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    _buildVelocityRow(context, "SYNCED TO COMMAND", '$syncedCount', Colors.greenAccent),
+                                    const SizedBox(height: 24),
+                                    Divider(color: colorScheme.outlineVariant.withValues(alpha: 0.2)),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      l10n.systemHealthy(syncedCount),
+                                      style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant, fontSize: 11),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
-                          ),
-                        )
-                      else ...[
-                        // Empty State: Queue Cleared
-                        const SizedBox(height: 24),
-                        Center(
-                          child: Column(
-                            children: [
-                              Icon(Icons.check_circle_outline, size: 64, color: colorScheme.primary.withValues(alpha: 0.2)),
-                              const SizedBox(height: 16),
-                              Text(
-                                "Queue Cleared",
-                                style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                "All field documentation is synced with command.",
-                                textAlign: TextAlign.center,
-                                style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 24),
-                      // List/Map Toggle
-                      Row(
-                        children: [
-                          _buildToggleButton(context, l10n.listTab, Icons.list, true),
-                          const SizedBox(width: 8),
-                          _buildToggleButton(context, l10n.mapTab, Icons.map, false),
-                        ],
+                          );
+                        }
                       ),
-                      const SizedBox(height: 24),
-                      // Task List (Now with Priority)
-                      TaskCard(
-                        title: "Utility Pole Inspection",
-                        subtitle: "Sector 7G - Structural integrity audit.",
-                        time: "08:30 AM",
-                        status: TaskStatus.synced,
-                        priority: TaskPriority.high,
-                        onTap: () => context.push('/task-details'),
-                      ),
-                      TaskCard(
-                        title: "Substation Delta-9",
-                        subtitle: "Manual retry required for 4 attachments.",
-                        status: TaskStatus.failed,
-                        priority: TaskPriority.high,
-                        onTap: () => context.push('/task-details'),
-                      ),
-                      TaskCard(
-                        title: "Water Main Assessment",
-                        subtitle: "Awaiting supervisor clearance.",
-                        location: "Downtown Plaza",
-                        status: TaskStatus.pending,
-                        priority: TaskPriority.medium,
-                        onTap: () => context.push('/task-details'),
-                      ),
-                      TaskCard(
-                        title: "Fiber Backbone Routing",
-                        subtitle: "Optimizing 4.2km trenching path.",
-                        status: TaskStatus.inProgress,
-                        priority: TaskPriority.low,
-                        onTap: () => context.push('/task-details'),
-                      ),
-                      const SizedBox(height: 24),
-                      // Daily Velocity Card
-                      Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: colorScheme.surfaceContainerLowest,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.2)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n.dailyVelocity,
-                              style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 24),
-                            _buildVelocityRow(context, l10n.target, '15', colorScheme.onSurfaceVariant),
-                            const SizedBox(height: 12),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: LinearProgressIndicator(
-                                value: 12/15,
-                                backgroundColor: colorScheme.outlineVariant.withValues(alpha: 0.2),
-                                valueColor: const AlwaysStoppedAnimation<Color>(Colors.greenAccent),
-                                minHeight: 8,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            _buildVelocityRow(context, l10n.achieved, '12', Colors.greenAccent),
-                            const SizedBox(height: 24),
-                            Divider(color: colorScheme.outlineVariant.withValues(alpha: 0.2)),
-                            const SizedBox(height: 12),
-                            Text(
-                              l10n.systemHealthy(12),
-                              style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant, fontSize: 11),
-                            ),
-                          ],
-                        ),
-                      ),
+
                       const SizedBox(height: 100),
                     ],
                   ),

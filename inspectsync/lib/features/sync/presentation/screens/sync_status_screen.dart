@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/sync_controller.dart';
 
@@ -209,6 +210,22 @@ class SyncStatusScreen extends StatelessWidget {
 
   Widget _buildHistoryCard(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final lastSync = controller.lastSyncedAt;
+    
+    String timeString = '--:--';
+    String dateString = 'Never';
+    
+    if (lastSync != null) {
+      timeString = DateFormat.Hm().format(lastSync);
+      final now = DateTime.now();
+      if (lastSync.year == now.year && lastSync.month == now.month && lastSync.day == now.day) {
+        dateString = 'Today';
+      } else if (lastSync.year == now.year && lastSync.month == now.month && lastSync.day == now.day - 1) {
+        dateString = 'Yesterday';
+      } else {
+        dateString = DateFormat.yMMMd().format(lastSync);
+      }
+    }
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -223,11 +240,11 @@ class SyncStatusScreen extends StatelessWidget {
           Icon(Icons.history, color: colorScheme.onSurfaceVariant, size: 16),
           Text('LAST SUCCESSFUL SYNC', style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 8)),
           const SizedBox(height: 12),
-          Text('14:22', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
+          Text(timeString, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Today', style: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 10)),
+              Text(dateString, style: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 10)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                 decoration: BoxDecoration(
@@ -259,7 +276,7 @@ class SyncStatusScreen extends StatelessWidget {
           Icon(Icons.offline_pin, color: Colors.green.shade700, size: 16),
           Text('LOCAL STORAGE', style: TextStyle(color: Colors.green.shade700, fontSize: 8, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
-          Text('1.2 GB', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
+          Text(controller.storageSize, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
           Text('Cached', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 10)),
         ],
       ),
@@ -379,7 +396,10 @@ class SyncStatusScreen extends StatelessWidget {
                 debugPrint('Resolving item: ${item.entityId}, Has conflict: ${conflict != null}');
                 
                 if (conflict != null && context.mounted) {
-                  context.push('/sync/conflict/${item.entityId}', extra: conflict);
+                  final result = await context.push('/sync/conflict/${item.entityId}', extra: conflict);
+                  if (result == true) {
+                    controller.syncNow();
+                  }
                 } else if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(

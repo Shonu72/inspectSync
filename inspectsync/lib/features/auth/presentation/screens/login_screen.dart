@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/services/toast_service.dart';
-import '../bloc/auth_cubit.dart';
-import '../bloc/auth_state.dart';
+import 'package:inspectsync/core/services/toast_service.dart';
+import 'package:inspectsync/features/auth/presentation/bloc/auth_cubit.dart';
+import 'package:inspectsync/features/auth/presentation/bloc/auth_state.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

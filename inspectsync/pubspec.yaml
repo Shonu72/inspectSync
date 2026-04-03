@@ -58,6 +58,7 @@ dependencies:
   bloc: ^9.2.0
   shared_preferences: ^2.5.5
   local_auth: ^3.0.1
+  talker: ^4.9.3
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:inspectsync/features/tasks/presentation/widgets/task_card.dart';
+import '../widgets/task_card.dart';
+import '../../data/task_repository.dart';
+import '../../../sync/presentation/providers/sync_controller.dart';
+import '../../../../core/db/app_database.dart';
 
 class TasksScreen extends StatelessWidget {
   const TasksScreen({super.key});
@@ -9,111 +13,132 @@ class TasksScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final repository = GetIt.I<TaskRepository>();
+    final syncController = GetIt.I<SyncController>();
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      body: CustomScrollView(
-        slivers: [
-          // Tactical Header
-          SliverAppBar(
-            expandedHeight: 120,
-            floating: false,
-            pinned: true,
-            backgroundColor: colorScheme.surface,
-            elevation: 0,
-            flexibleSpace: FlexibleSpaceBar(
-              centerTitle: false,
-              titlePadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              title: Text(
-                'FIELD ASSIGNMENTS',
-                style: textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 2.0,
-                  color: colorScheme.primary,
-                ),
-              ),
-            ),
-            actions: [
-              IconButton(icon: const Icon(Icons.filter_list_rounded), onPressed: () {}),
-              const SizedBox(width: 8),
-            ],
-          ),
-          
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                _buildSectionHeader(context, "ACTIVE DIRECTIVES"),
-                const SizedBox(height: 16),
-                
-                TaskCard(
-                  title: "Substation Fiber Inspection",
-                  subtitle: "ID: #OPS-2024-99X",
-                  location: "North Grid Cluster",
-                  time: "09:00 - 11:30",
-                  status: TaskStatus.inProgress,
-                  priority: TaskPriority.high,
-                  onTap: () => context.push('/task-details'),
-                ),
-                TaskCard(
-                  title: "HVAC Circuit Maintenance",
-                  subtitle: "ID: #OPS-2024-88B",
-                  location: "Industrial Park South",
-                  time: "13:00 - 15:30",
-                  status: TaskStatus.pending,
-                  priority: TaskPriority.medium,
-                  onTap: () => context.push('/task-details'),
-                ),
-                TaskCard(
-                  title: "Optical Sensor Calibration",
-                  subtitle: "ID: #OPS-2024-77C",
-                  location: "Sector 7G Lab",
-                  status: TaskStatus.failed,
-                  priority: TaskPriority.high,
-                  onTap: () => context.push('/task-details'),
-                ),
-                
-                const SizedBox(height: 40),
-                _buildSectionHeader(context, "SYSTEM TELEMETRY"),
-                const SizedBox(height: 16),
-                
-                _buildTacticalStatusCard(
-                  context,
-                  icon: Icons.shield_outlined,
-                  title: "ENCRYPTION ACTIVE",
-                  subtitle: "End-to-end field data integrity verified.",
-                  color: Colors.green,
-                ),
-                const SizedBox(height: 12),
-                _buildTacticalStatusCard(
-                  context,
-                  icon: Icons.cloud_off_rounded,
-                  title: "LOCAL CACHE MODE",
-                  subtitle: "Offline performance optimization enabled.",
-                  color: Colors.orange,
-                ),
-                
-                const SizedBox(height: 48),
-                Center(
-                  child: Opacity(
-                    opacity: 0.5,
-                    child: Column(
-                      children: [
-                        const Icon(Icons.terminal_rounded, size: 24),
-                        const SizedBox(height: 8),
-                        Text(
-                          "InspectSync // SECURE TERMINAL v4.2.0",
-                          style: textTheme.labelSmall?.copyWith(letterSpacing: 1.0, fontWeight: FontWeight.bold),
+    return ListenableBuilder(
+      listenable: syncController,
+      builder: (context, _) {
+        final isOffline = syncController.isOffline;
+        
+        return Scaffold(
+          backgroundColor: colorScheme.surface,
+          body: StreamBuilder<List<Task>>(
+            stream: repository.watchTasks(),
+            builder: (context, snapshot) {
+              final tasks = snapshot.data ?? [];
+              
+              return CustomScrollView(
+                slivers: [
+                  // Tactical Header
+                  SliverAppBar(
+                    expandedHeight: 120,
+                    floating: false,
+                    pinned: true,
+                    backgroundColor: colorScheme.surface,
+                    elevation: 0,
+                    flexibleSpace: FlexibleSpaceBar(
+                      centerTitle: false,
+                      titlePadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      title: Text(
+                        'FIELD ASSIGNMENTS',
+                        style: textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 2.0,
+                          color: colorScheme.primary,
                         ),
-                      ],
+                      ),
+                    ),
+                    actions: [
+                      IconButton(icon: const Icon(Icons.filter_list_rounded), onPressed: () {}),
+                      const SizedBox(width: 8),
+                    ],
+                  ),
+                  
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                        _buildSectionHeader(context, "ACTIVE DIRECTIVES"),
+                        const SizedBox(height: 16),
+                        
+                        if (tasks.isEmpty)
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 48.0),
+                              child: Column(
+                                children: [
+                                  Icon(Icons.assignment_turned_in_rounded, size: 48, color: colorScheme.outlineVariant),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    "NO ACTIVE ASSIGNMENTS",
+                                    style: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        else
+                          ...tasks.map((Task task) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: TaskCard(
+                              title: task.title,
+                              subtitle: "ID: #OPS-${task.id.substring(0, 8).toUpperCase()}",
+                              location: task.lat != null ? "COORD: ${task.lat}, ${task.lng}" : "LOCATION PENDING",
+                              time: "${task.updatedAt.hour}:${task.updatedAt.minute.toString().padLeft(2, '0')}",
+                              status: task.isSynced 
+                                  ? TaskStatus.synced 
+                                  : (isOffline ? TaskStatus.pending : TaskStatus.inProgress),
+                              priority: TaskPriority.medium, // Default for now
+                              onTap: () => context.push('/task/${task.id}'),
+                            ),
+                          )),
+                        
+                        const SizedBox(height: 40),
+                        _buildSectionHeader(context, "SYSTEM TELEMETRY"),
+                        const SizedBox(height: 16),
+                        
+                        _buildTacticalStatusCard(
+                          context,
+                          icon: Icons.shield_outlined,
+                          title: "ENCRYPTION ACTIVE",
+                          subtitle: "End-to-end field data integrity verified.",
+                          color: Colors.green,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildTacticalStatusCard(
+                          context,
+                          icon: Icons.cloud_off_rounded,
+                          title: "LOCAL CACHE MODE",
+                          subtitle: "Offline performance optimization enabled.",
+                          color: Colors.orange,
+                        ),
+                        
+                        const SizedBox(height: 48),
+                        Center(
+                          child: Opacity(
+                            opacity: 0.5,
+                            child: Column(
+                              children: [
+                                const Icon(Icons.terminal_rounded, size: 24),
+                                const SizedBox(height: 8),
+                                Text(
+                                  "InspectSync // SECURE TERMINAL v4.2.0",
+                                  style: textTheme.labelSmall?.copyWith(letterSpacing: 1.0, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ]),
                     ),
                   ),
-                ),
-              ]),
-            ),
+                ],
+              );
+            },
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

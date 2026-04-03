@@ -21,7 +21,7 @@ class AppRouter {
   static const String dashboard = '/dashboard';
   static const String sync = '/sync';
   static const String profile = '/profile';
-  static const String taskDetails = '/task-details';
+  static const String taskDetails = '/task/:id';
   static const String createTask = '/create-task';
   static const String conflictResolution = '/sync/conflict/:id';
 
@@ -66,7 +66,10 @@ class AppRouter {
         ),
         GoRoute(
           path: taskDetails,
-          builder: (context, state) => const TaskDetailsScreen(),
+          builder: (context, state) {
+            final taskId = state.pathParameters['id']!;
+            return TaskDetailsScreen(taskId: taskId);
+          },
         ),
         GoRoute(
           path: createTask,

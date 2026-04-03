@@ -8,6 +8,7 @@ import '../db/app_database.dart';
 import '../network/connectivity_service.dart';
 import '../theme/theme_cubit.dart';
 import '../security/security_cubit.dart';
+import '../util/logger.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/login_usecase.dart';
 import '../../features/auth/domain/usecases/logout_usecase.dart';
@@ -27,6 +28,9 @@ final sl = GetIt.instance;
 
 Future<void> init() async {
   // Core
+  final talker = AppLogger.talker;
+  sl.registerLazySingleton(() => talker);
+
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton(() => sharedPreferences);
 
@@ -40,7 +44,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => dio);
   
   sl.registerLazySingleton(() => AuthInterceptor(storage: sl()));
-  sl.registerLazySingleton(() => ApiClient(dio: sl(), authInterceptor: sl()));
+  sl.registerLazySingleton(() => ApiClient(dio: sl(), authInterceptor: sl(), talker: sl()));
   
   sl.registerLazySingleton(() => AppDatabase());
   sl.registerLazySingleton(() => ConnectivityService());
@@ -66,7 +70,7 @@ Future<void> init() async {
   
   // Features - Sync & Tasks
   sl.registerLazySingleton(() => TaskLocalDataSource(sl()));
-  sl.registerLazySingleton(() => TaskRemoteDataSource());
+  sl.registerLazySingleton(() => TaskRemoteDataSource(apiClient: sl()));
   sl.registerLazySingleton(() => SyncQueueManager(sl()));
   sl.registerLazySingleton(() => ConflictResolver(sl()));
   
@@ -75,6 +79,8 @@ Future<void> init() async {
     remote: sl<TaskRemoteDataSource>(),
     local: sl<TaskLocalDataSource>(),
     conflictResolver: sl(),
+    connectivityService: sl(),
+    prefs: sl(),
   ));
 
   sl.registerLazySingleton(() => TaskRepository(

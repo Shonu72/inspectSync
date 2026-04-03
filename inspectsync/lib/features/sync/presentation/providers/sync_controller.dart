@@ -1,3 +1,7 @@
+import 'dart:async';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 import 'package:flutter/material.dart';
 
 import '../../../../core/db/app_database.dart';
@@ -11,10 +15,11 @@ class SyncController extends ChangeNotifier {
   final AppDatabase _db;
   final ConnectivityService connectivityService;
 
-  bool _manualOffline = false;
   SyncProgress? _currentProgress;
   List<SyncQueueData> _pendingItems = [];
   Map<String, Conflict> _conflicts = {};
+  String _storageSize = '0 KB';
+  StreamSubscription? _queueSubscription;
 
   SyncController(
     this._syncService,
@@ -25,32 +30,37 @@ class SyncController extends ChangeNotifier {
     _syncService.progressStream.listen((progress) {
       _currentProgress = progress;
       loadData();
+      if (!progress.isSyncing) {
+        calculateStorageSize(); // Re-calculate after sync completes
+      }
       notifyListeners();
     });
 
     // React to connectivity changes
     connectivityService.addListener(_onConnectivityChanged);
 
+    // React to queue changes automatically
+    _queueSubscription = _queueManager.watchPendingQueue().listen((items) {
+      _pendingItems = items;
+      notifyListeners();
+    });
+
     loadData();
+    calculateStorageSize();
   }
 
   SyncProgress? get progress => _currentProgress;
   bool get isSyncing => _currentProgress?.isSyncing ?? false;
   List<SyncQueueData> get pendingItems => _pendingItems;
-  bool get isOnline => !_manualOffline && connectivityService.isOnline;
-  bool get isOffline => _manualOffline || connectivityService.isOffline;
-  bool get isManualOffline => _manualOffline;
-  ConnectivityStatus get connectivityStatus => _manualOffline ? ConnectivityStatus.offline : connectivityService.status;
+  bool get isOnline => connectivityService.isOnline;
+  bool get isOffline => connectivityService.isOffline;
+  bool get isManualOffline => connectivityService.isManualOffline;
+  ConnectivityStatus get connectivityStatus => connectivityService.status;
+  DateTime? get lastSyncedAt => _syncService.lastSuccessfulSync;
+  String get storageSize => _storageSize;
 
   void setManualOffline(bool value) {
-    _manualOffline = value;
-    notifyListeners();
-    if (value) {
-      debugPrint('SyncController: Manual offline mode engaged');
-    } else {
-      debugPrint('SyncController: Manual offline mode disengaged');
-      _onConnectivityChanged(); // Re-check if we should sync now
-    }
+    connectivityService.setManualOffline(value);
   }
 
   void _onConnectivityChanged() {
@@ -72,9 +82,9 @@ class SyncController extends ChangeNotifier {
   Conflict? getConflictForEntity(String entityId) => _conflicts[entityId];
 
   void syncNow() {
-    if (!isSyncing && connectivityService.isOnline) {
+    if (!isSyncing && isOnline) {
       _syncService.triggerImmediateSync();
-    } else if (connectivityService.isOffline) {
+    } else if (isOffline) {
       debugPrint('SyncController: Cannot sync — device is offline');
     }
   }
@@ -82,6 +92,29 @@ class SyncController extends ChangeNotifier {
   /// Force a connectivity recheck (e.g. user pulls to refresh)
   Future<bool> recheckConnectivity() async {
     return connectivityService.checkNow();
+  }
+
+  Future<void> calculateStorageSize() async {
+    try {
+      final dbFolder = await getApplicationDocumentsDirectory();
+      final file = File(p.join(dbFolder.path, 'db.sqlite'));
+      
+      if (await file.exists()) {
+        final bytes = await file.length();
+        if (bytes < 1024) {
+          _storageSize = '$bytes B';
+        } else if (bytes < 1024 * 1024) {
+          _storageSize = '${(bytes / 1024).toStringAsFixed(1)} KB';
+        } else if (bytes < 1024 * 1024 * 1024) {
+          _storageSize = '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+        } else {
+          _storageSize = '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+        }
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('SyncController: Error calculating storage size: $e');
+    }
   }
 
   Future<List<Conflict>> getUnresolvedConflicts() async {
@@ -93,6 +126,7 @@ class SyncController extends ChangeNotifier {
   @override
   void dispose() {
     connectivityService.removeListener(_onConnectivityChanged);
+    _queueSubscription?.cancel();
     super.dispose();
   }
 }

@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
-import '../../../../core/db/app_database.dart';
-import '../../../../core/theme/app_theme.dart';
+import 'package:inspectsync/core/db/app_database.dart';
+import 'package:inspectsync/core/theme/app_theme.dart';
 
 class ConflictResolutionScreen extends StatefulWidget {
   final Conflict conflict;
@@ -53,12 +53,43 @@ class _ConflictResolutionScreenState extends State<ConflictResolutionScreen> {
       }
     });
 
-    if (widget.conflict.entityId.isNotEmpty) {
-      await (widget.db.update(widget.db.conflicts)..where((c) => c.id.equals(widget.conflict.id)))
-          .write(const ConflictsCompanion(status: drift.Value('resolved')));
-      
-      if (mounted) Navigator.pop(context, true);
-    }
+    final int maxVersion = (localData['version'] as int? ?? 1) > (serverData['version'] as int? ?? 1)
+        ? (localData['version'] as int? ?? 1)
+        : (serverData['version'] as int? ?? 1);
+    final int nextVersion = maxVersion + 1;
+
+    // 1. Update the actual task in local DB
+    await (widget.db.update(widget.db.tasks)..where((t) => t.id.equals(widget.conflict.entityId)))
+        .write(TasksCompanion(
+          title: drift.Value(resolvedData['title'] ?? ''),
+          description: drift.Value(resolvedData['description']),
+          status: drift.Value(resolvedData['status'] ?? 'pending'),
+          version: drift.Value(nextVersion),
+          isSynced: const drift.Value(false),
+          updatedAt: drift.Value(DateTime.now()),
+        ));
+
+    // 2. Add as a NEW operation in sync queue to broadcast the resolution
+    final payload = jsonEncode({
+      ...resolvedData,
+      'version': nextVersion,
+      'updatedAt': DateTime.now().toIso8601String(),
+    });
+
+    await widget.db.into(widget.db.syncQueue).insert(SyncQueueCompanion.insert(
+      entityId: widget.conflict.entityId,
+      entityType: 'task',
+      action: 'update',
+      payload: payload,
+      createdAt: DateTime.now(),
+    ));
+
+    // 3. Mark the conflict record as resolved
+    await (widget.db.update(widget.db.conflicts)
+          ..where((c) => c.id.equals(widget.conflict.id)))
+        .write(const ConflictsCompanion(status: drift.Value('resolved')));
+    
+    if (mounted) Navigator.pop(context, true);
   }
 
   @override
@@ -85,7 +116,7 @@ class _ConflictResolutionScreenState extends State<ConflictResolutionScreen> {
                   const SizedBox(height: 16),
                   _buildBulkActions(),
                   const SizedBox(height: 24),
-                  ...conflictingKeys.map((key) => _buildConflictCard(key)).toList(),
+                  ...conflictingKeys.map((key) => _buildConflictCard(key)),
                   _buildFinalReview(),
                   const SizedBox(height: 32),
                 ],

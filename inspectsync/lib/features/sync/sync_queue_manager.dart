@@ -9,9 +9,15 @@ class SyncQueueManager {
   Future<List<SyncQueueData>> getPendingQueue() async {
     return (_db.select(_db.syncQueue)
           ..where((q) => q.status.equals('pending') | q.status.equals('failed'))
-          // Prevent hitting things too fast if they keep failing, logic can be added here
           ..orderBy([(q) => drift.OrderingTerm(expression: q.createdAt)]))
         .get();
+  }
+
+  Stream<List<SyncQueueData>> watchPendingQueue() {
+    return (_db.select(_db.syncQueue)
+          ..where((q) => q.status.equals('pending') | q.status.equals('failed'))
+          ..orderBy([(q) => drift.OrderingTerm(expression: q.createdAt)]))
+        .watch();
   }
 
   Future<void> markQueueSyncing(int id) async {
@@ -34,5 +40,12 @@ class SyncQueueManager {
     } catch (e) {
       return false;
     }
+  }
+
+  Future<bool> hasPending(String entityId) async {
+    final result = await (_db.select(_db.syncQueue)
+          ..where((q) => q.entityId.equals(entityId)))
+        .get();
+    return result.isNotEmpty;
   }
 }
