@@ -19,70 +19,53 @@ InspectSync is a Flutter-based mobile application designed for field engineers t
 | **Connectivity Monitoring** | ✅ Completed | 100% |
 | **Create Task Flow** | ✅ Completed | 90% |
 | **Design System (Theming)** | ✅ Completed | 100% |
-| **Localization (i18n)** | ✅ Completed | 80% |
+| **User Profile & Settings** | ✅ Completed | 100% |
+| **Localization (i18n)** | ✅ Completed | 85% |
+| **Backend API Integration** | ✅ Completed (Auth & Profile) | 60% |
 | **Admin Dashboard (Desktop)** | 🔲 Not Started | 0% |
 | **Push Notifications** | 🔲 Not Started | 0% |
-| **User Profile & Settings** | 🔲 Not Started | 0% |
 | **Analytics & Reporting** | 🔲 Not Started | 0% |
-| **Backend API Integration** | 🔲 Stubbed | 15% |
 
-**Overall Progress: ~65%**
+**Overall Progress: ~75%**
 
 ```
-████████████████████░░░░░░░░░░░  65%
+████████████████████████░░░░░░  75%
 ```
 
 ---
 
 ## 🏗️ Architecture
 
-The project follows a **feature-first modular architecture** with a clear separation between data, domain, and presentation layers.
+The project follows a **Clean Architecture (Data/Domain/Presentation/Bloc)** pattern with strict separation of concerns.
 
 ```
 lib/
-├── main.dart                         # App entry point, dependency wiring, GoRouter config
+├── main.dart                         # App entry point, MultiBlocProvider, GoRouter config
 ├── core/
+│   ├── di/
+│   │   └── injection_container.dart  # Central GetIt dependency injection
 │   ├── db/
 │   │   ├── app_database.dart         # Drift database definition
-│   │   ├── app_database.g.dart       # Generated Drift code
-│   │   └── tables/
-│   │       ├── tasks_table.dart      # Tasks schema
-│   │       ├── sync_queue_table.dart  # Offline sync queue schema
-│   │       └── conflicts_table.dart  # Conflict tracking schema
+│   │   └── tables/                   # Tasks, SyncQueue, Conflicts schemas
 │   ├── network/
+│   │   ├── api_client.dart           # Dio-based REST client
 │   │   └── connectivity_service.dart # Real internet reachability monitor
-│   └── theme/
-│       └── app_theme.dart            # Dual-mode design system (Light + Dark)
+│   ├── theme/
+│   │   ├── app_theme.dart            # Dual-mode design system
+│   │   └── theme_cubit.dart          # Persistent appearance management
+│   └── security/
+│       └── security_cubit.dart       # Biometric hardware management
 ├── features/
-│   ├── auth/                         # Authentication module
+│   ├── auth/                         # Auth module (Clean Architecture)
+│   │   ├── domain/                   # Entities, Repositories, UseCases
+│   │   ├── data/                     # Models, Repositories, DataSources
+│   │   └── presentation/             # Bloc (Cubit), Screens, Widgets
+│   ├── profile/                      # Engineer Profile & Settings
 │   ├── dashboard/                    # Command center dashboard
 │   ├── map/                          # Geospatial map view
 │   ├── sync/                         # Offline sync engine
-│   │   ├── sync_service.dart         # Core sync orchestrator
-│   │   ├── sync_queue_manager.dart   # Queue CRUD operations
-│   │   ├── conflict_resolver.dart    # Conflict detection & resolution
-│   │   └── presentation/
-│   │       ├── providers/
-│   │       │   └── sync_controller.dart
-│   │       └── screens/
-│   │           ├── sync_status_screen.dart
-│   │           └── conflict_resolution_screen.dart
 │   └── tasks/                        # Task management module
-│       ├── data/
-│       │   ├── task_local_datasource.dart
-│       │   ├── task_remote_datasource.dart
-│       │   └── task_repository.dart
-│       └── presentation/
-│           ├── screens/
-│           │   ├── tasks_screen.dart
-│           │   ├── task_details_screen.dart
-│           │   └── create_task_screen.dart
-│           └── widgets/
-│               └── task_card.dart
-└── l10n/                             # Localization
-    ├── app_en.arb                    # English translations
-    ├── app_localizations.dart        # Generated l10n
-    └── app_localizations_en.dart     # Generated English delegate
+└── l10n/                             # Localization (en)
 ```
 
 ---
@@ -92,14 +75,14 @@ lib/
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
 | **Framework** | Flutter 3.x (Dart ^3.11.0) | Cross-platform mobile UI |
+| **Architecture** | Clean Architecture | Modularity & testability |
+| **State Management** | **Flutter Bloc (Cubit)** | Reactive & predictable state |
+| **Dep. Injection** | **GetIt ^8.0.2** | Centralized service registry |
 | **Local Database** | Drift (SQLite) | Offline-first persistent storage |
 | **Navigation** | GoRouter ^17.1.0 | Declarative routing & deep linking |
-| **Connectivity** | connectivity_plus ^7.1.0 | Network interface monitoring |
-| **Maps** | flutter_map ^8.2.2 + latlong2 | OpenStreetMap tile rendering |
-| **Typography** | Google Fonts (Manrope + Inter) | Premium design system fonts |
-| **Localization** | flutter_localizations + intl | Multi-language support |
-| **Code Generation** | drift_dev + build_runner | Database DAO generation |
-| **State Management** | ChangeNotifier + ListenableBuilder | Lightweight reactive state |
+| **Security** | `local_auth` + `flutter_secure_storage` | Biometrics & credential encryption |
+| **Connectivity** | `connectivity_plus` + Lookup | Two-layer network monitoring |
+| **Theming** | `shared_preferences` | Persistent Dark/Light mode |
 
 ---
 
@@ -142,6 +125,7 @@ InspectSync implements a **dual-mode design system** called the **"Tactical Arch
 - **Priority-sorted Task Cards**: Tasks displayed with P1/P2/P3 color-coded indicators
 - **Daily Velocity Tracker**: Progress gauge with target vs. achieved metrics
 - **List/Map Toggle**: Switch between list and map visualization modes
+- **Profile Redirection**: Tapping initials navigates to the dedicated Profile screen
 
 ### 3. Tasks Screen (Field Assignments)
 - Scrollable list of active directives with tactical headers
@@ -168,6 +152,17 @@ InspectSync implements a **dual-mode design system** called the **"Tactical Arch
 - Full-screen OpenStreetMap tile layer via `flutter_map`
 - Marker layer with task location pins
 - Interactive zoom and pan controls
+
+### 7. Engineer Profile Screen
+- **User Telemetry**: Displays real-time name, role, and "Verified" status from `AuthCubit`
+- **Functional Controls**:
+    - **Appearance**: Persistent Dark/Light mode toggle
+    - **Offline Mode**: Manual networking override for data privacy
+    - **Biometric Login**: Hardware-aware FaceID/Fingerprint toggle
+- **Account Actions**:
+    - Change Password (UI stub)
+    - **Logout**: Safe session termination with confirmation dialog
+    - **Delete Account**: Destructive action with security warning
 
 ### 7. Sync Status Screen (Telemetry View)
 - **Sync Progress Card**: Real-time progress bar with percentage, current item description, and Sync Now / Cancel All actions
@@ -253,8 +248,9 @@ All navigation is managed through **GoRouter** with the following route table:
 
 | Route | Screen | Type |
 |-------|--------|------|
-| `/` | LoginScreen | Root |
+| `/` | LoginScreen | Root (Guard-protected) |
 | `/dashboard` | MainScreen (with BottomAppBar shell) | Authenticated root |
+| `/profile` | ProfileScreen | Full-screen push |
 | `/sync` | SyncStatusScreen | Full-screen push |
 | `/sync/conflict/:id` | ConflictResolutionScreen | Full-screen push (with `extra` data) |
 | `/task-details` | TaskDetailsScreen | Full-screen push |
