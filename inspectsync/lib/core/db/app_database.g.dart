@@ -64,6 +64,18 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _priorityMeta = const VerificationMeta(
+    'priority',
+  );
+  @override
+  late final GeneratedColumn<int> priority = GeneratedColumn<int>(
+    'priority',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
   static const VerificationMeta _versionMeta = const VerificationMeta(
     'version',
   );
@@ -121,6 +133,7 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     lat,
     lng,
     status,
+    priority,
     version,
     isSynced,
     updatedAt,
@@ -179,6 +192,12 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
       );
     } else if (isInserting) {
       context.missing(_statusMeta);
+    }
+    if (data.containsKey('priority')) {
+      context.handle(
+        _priorityMeta,
+        priority.isAcceptableOrUnknown(data['priority']!, _priorityMeta),
+      );
     }
     if (data.containsKey('version')) {
       context.handle(
@@ -241,6 +260,10 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         DriftSqlType.string,
         data['${effectivePrefix}status'],
       )!,
+      priority: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}priority'],
+      )!,
       version: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}version'],
@@ -273,6 +296,7 @@ class Task extends DataClass implements Insertable<Task> {
   final double? lat;
   final double? lng;
   final String status;
+  final int priority;
   final int version;
   final bool isSynced;
   final DateTime updatedAt;
@@ -284,6 +308,7 @@ class Task extends DataClass implements Insertable<Task> {
     this.lat,
     this.lng,
     required this.status,
+    required this.priority,
     required this.version,
     required this.isSynced,
     required this.updatedAt,
@@ -304,6 +329,7 @@ class Task extends DataClass implements Insertable<Task> {
       map['lng'] = Variable<double>(lng);
     }
     map['status'] = Variable<String>(status);
+    map['priority'] = Variable<int>(priority);
     map['version'] = Variable<int>(version);
     map['is_synced'] = Variable<bool>(isSynced);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -321,6 +347,7 @@ class Task extends DataClass implements Insertable<Task> {
       lat: lat == null && nullToAbsent ? const Value.absent() : Value(lat),
       lng: lng == null && nullToAbsent ? const Value.absent() : Value(lng),
       status: Value(status),
+      priority: Value(priority),
       version: Value(version),
       isSynced: Value(isSynced),
       updatedAt: Value(updatedAt),
@@ -340,6 +367,7 @@ class Task extends DataClass implements Insertable<Task> {
       lat: serializer.fromJson<double?>(json['lat']),
       lng: serializer.fromJson<double?>(json['lng']),
       status: serializer.fromJson<String>(json['status']),
+      priority: serializer.fromJson<int>(json['priority']),
       version: serializer.fromJson<int>(json['version']),
       isSynced: serializer.fromJson<bool>(json['isSynced']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -356,6 +384,7 @@ class Task extends DataClass implements Insertable<Task> {
       'lat': serializer.toJson<double?>(lat),
       'lng': serializer.toJson<double?>(lng),
       'status': serializer.toJson<String>(status),
+      'priority': serializer.toJson<int>(priority),
       'version': serializer.toJson<int>(version),
       'isSynced': serializer.toJson<bool>(isSynced),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -370,6 +399,7 @@ class Task extends DataClass implements Insertable<Task> {
     Value<double?> lat = const Value.absent(),
     Value<double?> lng = const Value.absent(),
     String? status,
+    int? priority,
     int? version,
     bool? isSynced,
     DateTime? updatedAt,
@@ -381,6 +411,7 @@ class Task extends DataClass implements Insertable<Task> {
     lat: lat.present ? lat.value : this.lat,
     lng: lng.present ? lng.value : this.lng,
     status: status ?? this.status,
+    priority: priority ?? this.priority,
     version: version ?? this.version,
     isSynced: isSynced ?? this.isSynced,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -396,6 +427,7 @@ class Task extends DataClass implements Insertable<Task> {
       lat: data.lat.present ? data.lat.value : this.lat,
       lng: data.lng.present ? data.lng.value : this.lng,
       status: data.status.present ? data.status.value : this.status,
+      priority: data.priority.present ? data.priority.value : this.priority,
       version: data.version.present ? data.version.value : this.version,
       isSynced: data.isSynced.present ? data.isSynced.value : this.isSynced,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -412,6 +444,7 @@ class Task extends DataClass implements Insertable<Task> {
           ..write('lat: $lat, ')
           ..write('lng: $lng, ')
           ..write('status: $status, ')
+          ..write('priority: $priority, ')
           ..write('version: $version, ')
           ..write('isSynced: $isSynced, ')
           ..write('updatedAt: $updatedAt, ')
@@ -428,6 +461,7 @@ class Task extends DataClass implements Insertable<Task> {
     lat,
     lng,
     status,
+    priority,
     version,
     isSynced,
     updatedAt,
@@ -443,6 +477,7 @@ class Task extends DataClass implements Insertable<Task> {
           other.lat == this.lat &&
           other.lng == this.lng &&
           other.status == this.status &&
+          other.priority == this.priority &&
           other.version == this.version &&
           other.isSynced == this.isSynced &&
           other.updatedAt == this.updatedAt &&
@@ -456,6 +491,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
   final Value<double?> lat;
   final Value<double?> lng;
   final Value<String> status;
+  final Value<int> priority;
   final Value<int> version;
   final Value<bool> isSynced;
   final Value<DateTime> updatedAt;
@@ -468,6 +504,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.lat = const Value.absent(),
     this.lng = const Value.absent(),
     this.status = const Value.absent(),
+    this.priority = const Value.absent(),
     this.version = const Value.absent(),
     this.isSynced = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -481,6 +518,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.lat = const Value.absent(),
     this.lng = const Value.absent(),
     required String status,
+    this.priority = const Value.absent(),
     this.version = const Value.absent(),
     this.isSynced = const Value.absent(),
     required DateTime updatedAt,
@@ -498,6 +536,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Expression<double>? lat,
     Expression<double>? lng,
     Expression<String>? status,
+    Expression<int>? priority,
     Expression<int>? version,
     Expression<bool>? isSynced,
     Expression<DateTime>? updatedAt,
@@ -511,6 +550,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       if (lat != null) 'lat': lat,
       if (lng != null) 'lng': lng,
       if (status != null) 'status': status,
+      if (priority != null) 'priority': priority,
       if (version != null) 'version': version,
       if (isSynced != null) 'is_synced': isSynced,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -526,6 +566,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Value<double?>? lat,
     Value<double?>? lng,
     Value<String>? status,
+    Value<int>? priority,
     Value<int>? version,
     Value<bool>? isSynced,
     Value<DateTime>? updatedAt,
@@ -539,6 +580,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       lat: lat ?? this.lat,
       lng: lng ?? this.lng,
       status: status ?? this.status,
+      priority: priority ?? this.priority,
       version: version ?? this.version,
       isSynced: isSynced ?? this.isSynced,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -568,6 +610,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (status.present) {
       map['status'] = Variable<String>(status.value);
     }
+    if (priority.present) {
+      map['priority'] = Variable<int>(priority.value);
+    }
     if (version.present) {
       map['version'] = Variable<int>(version.value);
     }
@@ -595,6 +640,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
           ..write('lat: $lat, ')
           ..write('lng: $lng, ')
           ..write('status: $status, ')
+          ..write('priority: $priority, ')
           ..write('version: $version, ')
           ..write('isSynced: $isSynced, ')
           ..write('updatedAt: $updatedAt, ')
@@ -1526,6 +1572,7 @@ typedef $$TasksTableCreateCompanionBuilder =
       Value<double?> lat,
       Value<double?> lng,
       required String status,
+      Value<int> priority,
       Value<int> version,
       Value<bool> isSynced,
       required DateTime updatedAt,
@@ -1540,6 +1587,7 @@ typedef $$TasksTableUpdateCompanionBuilder =
       Value<double?> lat,
       Value<double?> lng,
       Value<String> status,
+      Value<int> priority,
       Value<int> version,
       Value<bool> isSynced,
       Value<DateTime> updatedAt,
@@ -1582,6 +1630,11 @@ class $$TasksTableFilterComposer extends Composer<_$AppDatabase, $TasksTable> {
 
   ColumnFilters<String> get status => $composableBuilder(
     column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get priority => $composableBuilder(
+    column: $table.priority,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1645,6 +1698,11 @@ class $$TasksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get priority => $composableBuilder(
+    column: $table.priority,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get version => $composableBuilder(
     column: $table.version,
     builder: (column) => ColumnOrderings(column),
@@ -1695,6 +1753,9 @@ class $$TasksTableAnnotationComposer
   GeneratedColumn<String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
+  GeneratedColumn<int> get priority =>
+      $composableBuilder(column: $table.priority, builder: (column) => column);
+
   GeneratedColumn<int> get version =>
       $composableBuilder(column: $table.version, builder: (column) => column);
 
@@ -1742,6 +1803,7 @@ class $$TasksTableTableManager
                 Value<double?> lat = const Value.absent(),
                 Value<double?> lng = const Value.absent(),
                 Value<String> status = const Value.absent(),
+                Value<int> priority = const Value.absent(),
                 Value<int> version = const Value.absent(),
                 Value<bool> isSynced = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
@@ -1754,6 +1816,7 @@ class $$TasksTableTableManager
                 lat: lat,
                 lng: lng,
                 status: status,
+                priority: priority,
                 version: version,
                 isSynced: isSynced,
                 updatedAt: updatedAt,
@@ -1768,6 +1831,7 @@ class $$TasksTableTableManager
                 Value<double?> lat = const Value.absent(),
                 Value<double?> lng = const Value.absent(),
                 required String status,
+                Value<int> priority = const Value.absent(),
                 Value<int> version = const Value.absent(),
                 Value<bool> isSynced = const Value.absent(),
                 required DateTime updatedAt,
@@ -1780,6 +1844,7 @@ class $$TasksTableTableManager
                 lat: lat,
                 lng: lng,
                 status: status,
+                priority: priority,
                 version: version,
                 isSynced: isSynced,
                 updatedAt: updatedAt,

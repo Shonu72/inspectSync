@@ -59,6 +59,11 @@ class SyncController extends ChangeNotifier {
   DateTime? get lastSyncedAt => _syncService.lastSuccessfulSync;
   String get storageSize => _storageSize;
 
+  // New Signal Integrity Getters
+  int get latencyMs => connectivityService.latencyMs;
+  double get speedMbps => connectivityService.speedMbps;
+  String get networkType => connectivityService.networkType;
+
   void setManualOffline(bool value) {
     connectivityService.setManualOffline(value);
   }

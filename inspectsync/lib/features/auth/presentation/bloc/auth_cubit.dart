@@ -3,17 +3,20 @@ import '../../../../core/usecases/usecase.dart';
 import '../../domain/usecases/login_usecase.dart';
 import '../../domain/usecases/logout_usecase.dart';
 import '../../domain/usecases/restore_session_usecase.dart';
+import '../../../sync/sync_service.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final LoginUseCase loginUseCase;
   final LogoutUseCase logoutUseCase;
   final RestoreSessionUseCase restoreSessionUseCase;
+  final SyncService syncService;
 
   AuthCubit({
     required this.loginUseCase,
     required this.logoutUseCase,
     required this.restoreSessionUseCase,
+    required this.syncService,
   }) : super(AuthInitial());
 
   Future<void> login(String email, String password) async {
@@ -23,7 +26,10 @@ class AuthCubit extends Cubit<AuthState> {
     
     result.fold(
       (failure) => emit(AuthError(failure.message)),
-      (user) => emit(AuthAuthenticated(user)),
+      (user) {
+        emit(AuthAuthenticated(user));
+        syncService.triggerImmediateSync();
+      },
     );
   }
 
@@ -46,6 +52,7 @@ class AuthCubit extends Cubit<AuthState> {
       (user) {
         if (user != null) {
           emit(AuthAuthenticated(user));
+          syncService.triggerImmediateSync();
         } else {
           emit(AuthUnauthenticated());
         }

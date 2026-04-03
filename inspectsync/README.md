@@ -12,16 +12,16 @@ InspectSync is a Flutter-based mobile application designed for field engineers t
 |--------|--------|------------|
 | **Authentication** | ✅ Completed | 100% |
 | **Dashboard** | ✅ Completed | 100% |
-| **Task Management** | ✅ Completed | 95% |
+| **Task Management** | ✅ Completed | 100% |
 | **Map View** | ✅ Completed | 85% |
-| **Sync Engine** | ✅ Completed | 90% |
-| **Conflict Resolution** | ✅ Completed | 90% |
+| **Sync Engine** | ✅ Completed | 100% |
+| **Conflict Resolution** | ✅ Completed | 95% |
 | **Connectivity Monitoring** | ✅ Completed | 100% |
-| **Create Task Flow** | ✅ Completed | 90% |
+| **Create Task Flow** | ✅ Completed | 100% |
 | **Design System (Theming)** | ✅ Completed | 100% |
 | **User Profile & Settings** | ✅ Completed | 100% |
-| **Localization (i18n)** | ✅ Completed | 85% |
-| **Backend API Integration** | ✅ Completed (Auth & Profile) | 60% |
+| **Localization (i18n)** | ✅ Completed | 90% |
+| **Backend API Integration** | ✅ Progressing | 75% |
 | **Admin Dashboard (Desktop)** | 🔲 Not Started | 0% |
 | **Push Notifications** | 🔲 Not Started | 0% |
 | **Analytics & Reporting** | 🔲 Not Started | 0% |
@@ -31,6 +31,18 @@ InspectSync is a Flutter-based mobile application designed for field engineers t
 ```
 ████████████████████████░░░░░░  75%
 ```
+---
+
+## 📦 Core Functional Modules
+
+The application is structured into several high-performance modules, each handling a specific domain of field operations:
+
+- **🔑 Authentication & Identity**: Manages secure engineer onboarding via JWT, persistent session handling, and biometric hardware verification (FaceID/Fingerprint).
+- **📡 Strategic Sync Engine**: The core heartbeat of the app. Features an optimistic offline-first architecture with a reactive SQLite queue, change tracking, and an isolated background routine for data reconciliation.
+- **📋 Task & Directive Management**: Handles the full lifecycle of field assignments—from priority-based creation and protocol definition to real-time execution tracking (Elapsed Time & Progress).
+- **📊 Command Dashboard**: A high-fidelity telemetry interface providing an at-a-glance view of sync health, daily mission velocity, and prioritized operation lists.
+- **🗺️ Geospatial Intelligence (Map)**: Interactive mapping layer using OpenStreetMap to visualize mission sectors and task coordinates in real-time.
+- **⚙️ Operational Settings**: Provides hardware-level controls, including an "Offline Mode" connectivity override and appearance management (Obsidian Command Dark Mode).
 
 ---
 
@@ -133,11 +145,14 @@ InspectSync implements a **dual-mode design system** called the **"Tactical Arch
 - Each task card supports full-card tap navigation to details
 
 ### 4. Task Details Screen (Tactical Interface)
-- **Mission Header**: Project ID, task title, location sector
-- **Operational Checklist**: Interactive toggle items with real-time progress tracking
-- **Field Evidence Section**: Photo grid with capture button (camera integration stub)
-- **Tactical Notes**: Multi-line text input for site observations
-- **Sticky Footer**: Elapsed time + completion percentage metrics + submit button
+- **Mission Header**: Project ID, task title, location sector.
+- **Operational Checklist**: Interactive toggle items with real-time progress tracking.
+- **Field Evidence Section**: Photo grid with capture button (camera integration stub).
+- **Tactical Notes**: Multi-line text input for site observations.
+- **Sticky Footer**: 
+  - **Live Elapsed Time**: Seconds-accurate timer since task creation (implemented via `StreamBuilder` for zero-impact on UI performance).
+  - **Dynamic Progress**: Real-time completion percentage based on checklist status.
+  - **Submit Button**: Finalizes the local report.
 
 ### 5. Create Task Screen
 - **Priority Toggle**: Animated HIGH / MED / LOW selector with color feedback
@@ -165,11 +180,11 @@ InspectSync implements a **dual-mode design system** called the **"Tactical Arch
     - **Delete Account**: Destructive action with security warning
 
 ### 7. Sync Status Screen (Telemetry View)
-- **Sync Progress Card**: Real-time progress bar with percentage, current item description, and Sync Now / Cancel All actions
-- **History Card**: Last successful sync timestamp with stability indicator
-- **Local Storage Card**: Cached data size display
-- **Queue List**: Pending sync items with status indicators (PENDING, UPLOADING, SYNCED, CONFLICT)
-- **Resolve Button**: Deep-links to the Conflict Resolution screen for failed items
+- **Sync Progress Card**: Real-time progress bar with percentage, current item description, and Sync Now / Cancel All actions.
+- **History Card**: Shows **"Last Successful Sync"** with dynamic human-readable formatting (e.g., "Today, 14:30") persisted via `SharedPreferences`.
+- **Local Storage Card**: Real-time **DB File Size** calculation (e.g., "425.0 KB") measured directly from the SQLite `db.sqlite` file.
+- **Reactive Queue List**: Pending sync items are displayed via a live `Stream`. Items appear in the queue **instantly** even in offline mode, reflecting the internal database state.
+- **Resolve Button**: Deep-links to the Conflict Resolution screen for failed items.
 
 ### 8. Conflict Resolution Screen
 - Side-by-side diff view of local vs. server data for conflicted entities
@@ -209,10 +224,11 @@ User Action → Local DB Write → Sync Queue Entry → Background Sync → Serv
 3. **ConflictResolver**: Compares local and server payloads field-by-field. When a difference is detected, it creates a `Conflict` record in the database with both versions for user resolution.
 
 4. **SyncController** (ChangeNotifier): The state manager that:
-   - Listens to `SyncService.progressStream` for real-time updates
-   - Exposes `isOnline`, `isOffline`, `isSyncing`, `pendingItems`, and `conflicts`
-   - Auto-triggers sync when connectivity is restored
-   - Blocks sync attempts when the device is offline
+   - Listens to `SyncService.progressStream` for real-time operation updates.
+   - **Reactive Queue**: Subscribes to the `SyncQueue` database stream to show pending items immediately (even offline).
+   - **Telemetry**: Calculates real disk usage of the local database.
+   - **Persistence**: Exposes the last successful sync time from shared preferences.
+   - Blocks sync attempts when the device is "Logically Offline" (Manual Mode).
 
 ### Database Schema
 
@@ -228,10 +244,11 @@ User Action → Local DB Write → Sync Queue Entry → Background Sync → Serv
 
 InspectSync implements a **two-layer connectivity verification** system:
 
-| Layer | Mechanism | Speed | Accuracy |
-|-------|-----------|-------|----------|
-| **Layer 1** | `connectivity_plus` (network interface detection) | Instant | Medium — detects WiFi/mobile toggle but not captive portals |
-| **Layer 2** | `InternetAddress.lookup('google.com')` (DNS reachability) | ~1-5 sec | High — verifies actual internet access |
+| Layer | Mechanism | Speed | Accuracy | Note |
+|-------|-----------|-------|----------|------|
+| **Layer 1** | `connectivity_plus` | Instant | Medium | Detects physical radio state (WiFi/Mobile) |
+| **Layer 2** | `InternetAddress.lookup` | ~1-5 sec | High | Verifies actual DNS reachability |
+| **Layer 3** | **Manual Toggle** | Instant | Perfect | User-defined "Offline Mode" for privacy/battery |
 
 ### Behavior
 

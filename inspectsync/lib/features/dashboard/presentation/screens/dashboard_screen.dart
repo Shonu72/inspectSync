@@ -237,14 +237,17 @@ class DashboardScreen extends StatelessWidget {
                             key: ValueKey(tasks.length),
                             children: [
                               ...tasks.take(3).map((Task t) {
-                                return TaskCard(
-                                  title: t.title,
-                                  subtitle: t.description ?? 'No protocol specified',
-                                  time: "${t.updatedAt.hour}:${t.updatedAt.minute.toString().padLeft(2, '0')}",
-                                  status: t.isSynced ? TaskStatus.synced : TaskStatus.pending,
-                                  priority: TaskPriority.medium,
-                                  onTap: () => context.push('/task/${t.id}'),
-                                );
+                                  final pInt = t.priority;
+                                  final priority = pInt == 0 ? TaskPriority.high : (pInt == 2 ? TaskPriority.low : TaskPriority.medium);
+
+                                  return TaskCard(
+                                    title: t.title,
+                                    subtitle: t.description ?? 'No protocol specified',
+                                    time: "${t.updatedAt.hour}:${t.updatedAt.minute.toString().padLeft(2, '0')}",
+                                    status: t.isSynced ? TaskStatus.synced : TaskStatus.pending,
+                                    priority: priority,
+                                    onTap: () => context.push('/task/${t.id}'),
+                                  );
                               }),
                               
                               const SizedBox(height: 24),

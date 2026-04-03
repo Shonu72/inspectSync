@@ -27,6 +27,12 @@ class _MainScreenState extends State<MainScreen> {
       const MapScreen(),
       const TasksScreen(),
     ];
+
+    // --- STRATEGIC BOOTSTRAP SYNC ---
+    // Automatically check for remote updates upon entering the operational interface.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.syncController.syncNow();
+    });
   }
 
   @override

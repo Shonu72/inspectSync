@@ -31,6 +31,7 @@ class TaskRepository {
     String? description,
     double? lat,
     double? lng,
+    int priority = 1, // Default to MED
   }) async {
     final now = DateTime.now();
     final task = Task(
@@ -40,6 +41,7 @@ class TaskRepository {
       lat: lat,
       lng: lng,
       status: 'pending',
+      priority: priority,
       version: 1,
       isSynced: false,
       updatedAt: now,

@@ -9,6 +9,7 @@ class Tasks extends Table {
   RealColumn get lng => real().nullable()();
 
   TextColumn get status => text()(); // pending, completed
+  IntColumn get priority => integer().withDefault(const Constant(1))(); // 0=High, 1=Med, 2=Low
   IntColumn get version => integer().withDefault(const Constant(1))();
 
   BoolColumn get isSynced => boolean().withDefault(const Constant(false))();

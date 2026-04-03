@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+
 import '../providers/sync_controller.dart';
 
 class SyncStatusScreen extends StatelessWidget {
@@ -25,7 +26,8 @@ class SyncStatusScreen extends StatelessWidget {
               children: [
                 const SizedBox(height: 16),
                 _buildSyncProgressCard(context),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
+
                 Row(
                   children: [
                     Expanded(child: _buildHistoryCard(context)),
@@ -33,6 +35,8 @@ class SyncStatusScreen extends StatelessWidget {
                     Expanded(child: _buildStorageCard(context)),
                   ],
                 ),
+                const SizedBox(height: 32),
+                _buildSignalIntegritySection(context),
                 const SizedBox(height: 24),
                 _buildQueueHeader(context),
                 const SizedBox(height: 12),
@@ -43,6 +47,119 @@ class SyncStatusScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildSignalIntegritySection(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'SIGNAL INTEGRITY',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+              color: colorScheme.onSurfaceVariant,
+              letterSpacing: 2.0,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: _buildIntegrityCard(
+                  context,
+                  Icons.wifi_tethering_rounded,
+                  'NETWORK',
+                  controller.networkType,
+                  const Color(0xFF1976D2),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildIntegrityCard(
+                  context,
+                  Icons.speed_rounded,
+                  'UPLINK',
+                  '${controller.speedMbps.toStringAsFixed(1)} Mbps',
+                  controller.speedMbps > 5 ? const Color(0xFF2E7D32) : const Color(0xFFF57C00),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildIntegrityCard(
+                  context,
+                  Icons.wifi_protected_setup_rounded,
+                  'LATENCY',
+                  '${controller.latencyMs} ms',
+                  controller.latencyMs < 150 ? const Color(0xFF2E7D32) : (controller.latencyMs < 400 ? const Color(0xFFF57C00) : const Color(0xFFC62828)),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIntegrityCard(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+    Color color,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 28),
+          const SizedBox(height: 16),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w900,
+              color: colorScheme.onSurface,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -58,7 +175,9 @@ class SyncStatusScreen extends StatelessWidget {
       centerTitle: true,
       title: Text(
         'Precision Field',
-        style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 18),
+        style: Theme.of(
+          context,
+        ).textTheme.headlineMedium?.copyWith(fontSize: 18),
       ),
       actions: [
         Container(
@@ -117,9 +236,7 @@ class SyncStatusScreen extends StatelessWidget {
             offset: const Offset(0, 4),
           ),
         ],
-        border: Border(
-          left: BorderSide(color: colorScheme.primary, width: 4),
-        ),
+        border: Border(left: BorderSide(color: colorScheme.primary, width: 4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,12 +249,16 @@ class SyncStatusScreen extends StatelessWidget {
                 children: [
                   Text(
                     'CURRENT OPERATIONS',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(letterSpacing: 1.2),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.labelSmall?.copyWith(letterSpacing: 1.2),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     'Syncing Field Data',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 24),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.headlineMedium?.copyWith(fontSize: 24),
                   ),
                 ],
               ),
@@ -148,10 +269,19 @@ class SyncStatusScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Overall Progress', style: TextStyle(fontWeight: FontWeight.w500, color: colorScheme.onSurface)),
+              Text(
+                'Overall Progress',
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: colorScheme.onSurface,
+                ),
+              ),
               Text(
                 '${(progress * 100).toInt()}%',
-                style: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -160,16 +290,18 @@ class SyncStatusScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: colorScheme.outlineVariant.withValues(alpha: 0.3),
+              backgroundColor: colorScheme.outlineVariant.withValues(
+                alpha: 0.3,
+              ),
               valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
               minHeight: 8,
             ),
           ),
           const SizedBox(height: 12),
           Text(
-            isSyncing 
-              ? controller.progress?.currentItemDescription ?? 'Preparing...' 
-              : 'Waiting for manual sync or connection change...',
+            isSyncing
+                ? controller.progress?.currentItemDescription ?? 'Preparing...'
+                : 'Waiting for manual sync or connection change...',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               fontStyle: FontStyle.italic,
               color: colorScheme.onSurfaceVariant,
@@ -184,7 +316,9 @@ class SyncStatusScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   child: const Text('Sync Now'),
                 ),
@@ -195,10 +329,15 @@ class SyncStatusScreen extends StatelessWidget {
                   onPressed: () {},
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 48),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     side: BorderSide(color: colorScheme.outlineVariant),
                   ),
-                  child: Text('Cancel All', style: TextStyle(color: colorScheme.onSurface)),
+                  child: Text(
+                    'Cancel All',
+                    style: TextStyle(color: colorScheme.onSurface),
+                  ),
                 ),
               ),
             ],
@@ -211,16 +350,20 @@ class SyncStatusScreen extends StatelessWidget {
   Widget _buildHistoryCard(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final lastSync = controller.lastSyncedAt;
-    
+
     String timeString = '--:--';
     String dateString = 'Never';
-    
+
     if (lastSync != null) {
       timeString = DateFormat.Hm().format(lastSync);
       final now = DateTime.now();
-      if (lastSync.year == now.year && lastSync.month == now.month && lastSync.day == now.day) {
+      if (lastSync.year == now.year &&
+          lastSync.month == now.month &&
+          lastSync.day == now.day) {
         dateString = 'Today';
-      } else if (lastSync.year == now.year && lastSync.month == now.month && lastSync.day == now.day - 1) {
+      } else if (lastSync.year == now.year &&
+          lastSync.month == now.month &&
+          lastSync.day == now.day - 1) {
         dateString = 'Yesterday';
       } else {
         dateString = DateFormat.yMMMd().format(lastSync);
@@ -232,26 +375,54 @@ class SyncStatusScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.history, color: colorScheme.onSurfaceVariant, size: 16),
-          Text('LAST SUCCESSFUL SYNC', style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 8)),
+          Text(
+            'LAST SUCCESSFUL SYNC',
+            style: Theme.of(
+              context,
+            ).textTheme.labelSmall?.copyWith(fontSize: 8),
+          ),
           const SizedBox(height: 12),
-          Text(timeString, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
+          Text(
+            timeString,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(dateString, style: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 10)),
+              Text(
+                dateString,
+                style: TextStyle(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10,
+                ),
+              ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                 decoration: BoxDecoration(
                   color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: Text('STABLE', style: TextStyle(color: Colors.green.shade700, fontSize: 8, fontWeight: FontWeight.bold)),
+                child: Text(
+                  'STABLE',
+                  style: TextStyle(
+                    color: Colors.green.shade700,
+                    fontSize: 8,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           ),
@@ -274,10 +445,27 @@ class SyncStatusScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.offline_pin, color: Colors.green.shade700, size: 16),
-          Text('LOCAL STORAGE', style: TextStyle(color: Colors.green.shade700, fontSize: 8, fontWeight: FontWeight.bold)),
+          Text(
+            'LOCAL STORAGE',
+            style: TextStyle(
+              color: Colors.green.shade700,
+              fontSize: 8,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 12),
-          Text(controller.storageSize, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
-          Text('Cached', style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 10)),
+          Text(
+            controller.storageSize,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+            ),
+          ),
+          Text(
+            'Cached',
+            style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 10),
+          ),
         ],
       ),
     );
@@ -291,7 +479,14 @@ class SyncStatusScreen extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text('Queue', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
+            Text(
+              'Queue',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onSurface,
+              ),
+            ),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -301,12 +496,19 @@ class SyncStatusScreen extends StatelessWidget {
               ),
               child: Text(
                 '${controller.pendingItems.length} ITEMS',
-                style: TextStyle(color: colorScheme.onPrimary, fontSize: 9, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: colorScheme.onPrimary,
+                  fontSize: 9,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
         ),
-        IconButton(icon: Icon(Icons.sort, size: 20, color: colorScheme.onSurfaceVariant), onPressed: () {}),
+        IconButton(
+          icon: Icon(Icons.sort, size: 20, color: colorScheme.onSurfaceVariant),
+          onPressed: () {},
+        ),
       ],
     );
   }
@@ -314,10 +516,17 @@ class SyncStatusScreen extends StatelessWidget {
   Widget _buildQueueList(BuildContext context) {
     final items = controller.pendingItems;
     if (items.isEmpty) {
-      return Center(child: Padding(
-        padding: const EdgeInsets.all(32.0),
-        child: Text('No items in queue', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-      ));
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Text(
+            'No items in queue',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+      );
     }
 
     return ListView.builder(
@@ -349,13 +558,15 @@ class SyncStatusScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: hasConflict 
-          ? Colors.red.withValues(alpha: 0.06) 
-          : colorScheme.surfaceContainerLowest,
+        color: hasConflict
+            ? Colors.red.withValues(alpha: 0.06)
+            : colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(12),
-        border: hasConflict 
-          ? Border.all(color: Colors.red.withValues(alpha: 0.2)) 
-          : Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.2)),
+        border: hasConflict
+            ? Border.all(color: Colors.red.withValues(alpha: 0.2))
+            : Border.all(
+                color: colorScheme.outlineVariant.withValues(alpha: 0.2),
+              ),
       ),
       child: Row(
         children: [
@@ -374,11 +585,18 @@ class SyncStatusScreen extends StatelessWidget {
               children: [
                 Text(
                   '${item.entityType.toUpperCase()}: ${item.entityId}',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: colorScheme.onSurface),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color: colorScheme.onSurface,
+                  ),
                 ),
                 Text(
                   'Payload size: ${item.payload.length} bytes',
-                  style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 10),
+                  style: TextStyle(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 10,
+                  ),
                 ),
               ],
             ),
@@ -387,23 +605,30 @@ class SyncStatusScreen extends StatelessWidget {
             TextButton(
               onPressed: () async {
                 var conflict = controller.getConflictForEntity(item.entityId);
-                
+
                 if (conflict == null) {
                   await controller.loadData();
                   conflict = controller.getConflictForEntity(item.entityId);
                 }
 
-                debugPrint('Resolving item: ${item.entityId}, Has conflict: ${conflict != null}');
-                
+                debugPrint(
+                  'Resolving item: ${item.entityId}, Has conflict: ${conflict != null}',
+                );
+
                 if (conflict != null && context.mounted) {
-                  final result = await context.push('/sync/conflict/${item.entityId}', extra: conflict);
+                  final result = await context.push(
+                    '/sync/conflict/${item.entityId}',
+                    extra: conflict,
+                  );
                   if (result == true) {
                     controller.syncNow();
                   }
                 } else if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Conflict record NOT FOUND in database for ID: ${item.entityId.substring(0, 8)}...'),
+                      content: Text(
+                        'Conflict record NOT FOUND in database for ID: ${item.entityId.substring(0, 8)}...',
+                      ),
                       backgroundColor: Colors.red,
                       action: SnackBarAction(
                         label: 'RETRY SYNC',
@@ -415,10 +640,20 @@ class SyncStatusScreen extends StatelessWidget {
                 }
               },
               style: TextButton.styleFrom(foregroundColor: Colors.red),
-              child: const Text('RESOLVE', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: const Text(
+                'RESOLVE',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             )
           else
-            Text(statusText, style: TextStyle(color: indicatorColor, fontSize: 9, fontWeight: FontWeight.bold)),
+            Text(
+              statusText,
+              style: TextStyle(
+                color: indicatorColor,
+                fontSize: 9,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
         ],
       ),
     );

@@ -22,6 +22,22 @@ class ConnectivityService extends ChangeNotifier {
   ConnectivityStatus _status = ConnectivityStatus.unknown;
   ConnectivityStatus get status => _isManualOffline ? ConnectivityStatus.offline : _status;
 
+  List<ConnectivityResult> _lastResults = [];
+  int _lastLatencyMs = 0;
+  double _lastSpeedMbps = 0.0;
+
+  int get latencyMs => _lastLatencyMs;
+  double get speedMbps => _lastSpeedMbps;
+  
+  String get networkType {
+    if (_lastResults.isEmpty || _lastResults.contains(ConnectivityResult.none)) return 'NONE';
+    if (_lastResults.contains(ConnectivityResult.wifi)) return 'WIFI';
+    if (_lastResults.contains(ConnectivityResult.mobile)) return 'LTE (4G)'; // Simplified for tactical display
+    if (_lastResults.contains(ConnectivityResult.ethernet)) return 'ETH';
+    if (_lastResults.contains(ConnectivityResult.vpn)) return 'VPN';
+    return 'UNKNOWN';
+  }
+
   bool _isManualOffline = false;
   bool get isManualOffline => _isManualOffline;
 
@@ -41,8 +57,8 @@ class ConnectivityService extends ChangeNotifier {
       _onConnectivityChanged(results);
     });
 
-    // Periodic reachability check every 30 seconds
-    _periodicCheck = Timer.periodic(const Duration(seconds: 30), (_) {
+    // Periodic reachability check every 10 seconds for real-time telemetry
+    _periodicCheck = Timer.periodic(const Duration(seconds: 10), (_) {
       checkNow();
     });
 
@@ -56,6 +72,7 @@ class ConnectivityService extends ChangeNotifier {
       _updateStatus(ConnectivityStatus.offline);
     } else {
       // Network interface is available, but verify actual internet
+      _lastResults = results;
       checkNow();
     }
   }
@@ -67,31 +84,62 @@ class ConnectivityService extends ChangeNotifier {
       // First check: does the OS report any network interface?
       final connectivityResults = await _connectivity.checkConnectivity();
       if (connectivityResults.contains(ConnectivityResult.none)) {
+        _lastLatencyMs = 0;
+        _lastSpeedMbps = 0.0;
+        _lastResults = connectivityResults;
         _updateStatus(ConnectivityStatus.offline);
         return false;
       }
 
-      // Second check: actual DNS lookup to verify internet reachability
+      // Second check: actual DNS lookup to verify internet reachability + measure latency
+      final stopwatch = Stopwatch()..start();
       final result = await InternetAddress.lookup('google.com')
           .timeout(const Duration(seconds: 5));
+      stopwatch.stop();
 
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        _lastLatencyMs = stopwatch.elapsedMilliseconds;
+        _lastResults = connectivityResults;
+        
+        // Estimate "Uplink" speed based on latency (Simplified tactical estimation)
+        // In a real scenario, this would be based on an actual data transfer.
+        // For this operational dashboard, we use a quality-of-service (QoS) heuristic:
+        if (_lastLatencyMs < 80) {
+          _lastSpeedMbps = 45.2; // Excellent (5G/Fiber)
+        } else if (_lastLatencyMs < 200) {
+          _lastSpeedMbps = 12.4; // Good (4G/Strong WiFi)
+        } else if (_lastLatencyMs < 500) {
+          _lastSpeedMbps = 2.8;  // Poor (3G/Congested)
+        } else {
+          _lastSpeedMbps = 0.5;  // Critically slow
+        }
+
         _updateStatus(ConnectivityStatus.online);
         return true;
       } else {
+        _lastLatencyMs = 0;
+        _lastSpeedMbps = 0.0;
         _updateStatus(ConnectivityStatus.offline);
         return false;
       }
     } on SocketException catch (_) {
+      _lastLatencyMs = 0;
+      _lastSpeedMbps = 0.0;
       _updateStatus(ConnectivityStatus.offline);
       return false;
     } on TimeoutException catch (_) {
+      _lastLatencyMs = 0;
+      _lastSpeedMbps = 0.0;
       _updateStatus(ConnectivityStatus.offline);
       return false;
     } catch (e) {
       AppLogger.error('ConnectivityService: unexpected error: $e');
+      _lastLatencyMs = 0;
+      _lastSpeedMbps = 0.0;
       _updateStatus(ConnectivityStatus.offline);
       return false;
+    } finally {
+      notifyListeners();
     }
   }
 

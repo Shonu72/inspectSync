@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:inspectsync/features/tasks/data/task_repository.dart';
 import 'package:inspectsync/core/services/toast_service.dart';
+import '../widgets/location_picker_modal.dart';
 
 class CreateTaskScreen extends StatefulWidget {
   const CreateTaskScreen({super.key});
@@ -13,7 +15,8 @@ class CreateTaskScreen extends StatefulWidget {
 class _CreateTaskScreenState extends State<CreateTaskScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _locationController = TextEditingController(text: 'Zone 04 - Sector B');
+  final _locationController = TextEditingController(text: 'SELECT MISSION SITE');
+  LatLng? _pickedLocation;
   
   int _selectedPriority = 1; // Default to Medium
   String _selectedCategory = 'Field Maintenance';
@@ -47,7 +50,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       await GetIt.I<TaskRepository>().createTask(
         title: title,
         description: _descriptionController.text.trim(),
-        // Repository handles default priority and versioning
+        priority: _selectedPriority,
+        lat: _pickedLocation?.latitude,
+        lng: _pickedLocation?.longitude,
       );
 
       ToastService.showSuccess('Task created and queued for sync');
@@ -336,8 +341,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
           ),
           Divider(height: 1, color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
           // Location Row
-          Padding(
-            padding: const EdgeInsets.all(20),
+          InkWell(
+            onTap: _pickLocationMode,
+            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
             child: Row(
               children: [
                 Container(
@@ -361,18 +369,24 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                       const SizedBox(height: 2),
                       Text(
                         _locationController.text,
-                        style: TextStyle(color: colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          color: _pickedLocation == null ? colorScheme.primary : colorScheme.onSurface, 
+                          fontSize: 15, 
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),
                 ),
+                Icon(Icons.map_rounded, color: colorScheme.primary.withValues(alpha: 0.5), size: 18),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
   // ─── Schedule Card ───────────────────────────────────────────
   Widget _buildScheduleCard(BuildContext context) {
@@ -603,5 +617,21 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       initialTime: _selectedTime,
     );
     if (picked != null) setState(() => _selectedTime = picked);
+  }
+
+  Future<void> _pickLocationMode() async {
+    final picked = await showModalBottomSheet<LatLng>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => LocationPickerModal(initialLocation: _pickedLocation),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _pickedLocation = picked;
+        _locationController.text = '${picked.latitude.toStringAsFixed(4)}, ${picked.longitude.toStringAsFixed(4)}';
+      });
+    }
   }
 }

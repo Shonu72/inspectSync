@@ -62,37 +62,42 @@ class TasksScreen extends StatelessWidget {
                         _buildSectionHeader(context, "ACTIVE DIRECTIVES"),
                         const SizedBox(height: 16),
                         
-                        if (tasks.isEmpty)
-                          Center(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 48.0),
-                              child: Column(
-                                children: [
-                                  Icon(Icons.assignment_turned_in_rounded, size: 48, color: colorScheme.outlineVariant),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    "NO ACTIVE ASSIGNMENTS",
-                                    style: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1.0),
-                                  ),
-                                ],
+                          if (tasks.isEmpty)
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 48.0),
+                                child: Column(
+                                  children: [
+                                    Icon(Icons.assignment_turned_in_rounded, size: 48, color: colorScheme.outlineVariant),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      "NO ACTIVE ASSIGNMENTS",
+                                      style: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          )
-                        else
-                          ...tasks.map((Task task) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12.0),
-                            child: TaskCard(
-                              title: task.title,
-                              subtitle: "ID: #OPS-${task.id.substring(0, 8).toUpperCase()}",
-                              location: task.lat != null ? "COORD: ${task.lat}, ${task.lng}" : "LOCATION PENDING",
-                              time: "${task.updatedAt.hour}:${task.updatedAt.minute.toString().padLeft(2, '0')}",
-                              status: task.isSynced 
-                                  ? TaskStatus.synced 
-                                  : (isOffline ? TaskStatus.pending : TaskStatus.inProgress),
-                              priority: TaskPriority.medium, // Default for now
-                              onTap: () => context.push('/task/${task.id}'),
-                            ),
-                          )),
+                            )
+                          else
+                            ...tasks.map((Task task) {
+                              final pInt = task.priority;
+                              final priority = pInt == 0 ? TaskPriority.high : (pInt == 2 ? TaskPriority.low : TaskPriority.medium);
+
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 12.0),
+                                child: TaskCard(
+                                  title: task.title,
+                                  subtitle: "ID: #OPS-${task.id.substring(0, 8).toUpperCase()}",
+                                  location: (task.lat != null && task.lng != null) ? "COORD: ${task.lat!.toStringAsFixed(4)}, ${task.lng!.toStringAsFixed(4)}" : "LOCATION PENDING",
+                                  time: "${task.updatedAt.hour}:${task.updatedAt.minute.toString().padLeft(2, '0')}",
+                                  status: task.isSynced 
+                                      ? TaskStatus.synced 
+                                      : (isOffline ? TaskStatus.pending : TaskStatus.inProgress),
+                                  priority: priority,
+                                  onTap: () => context.push('/task/${task.id}'),
+                                ),
+                              );
+                            }),
                         
                         const SizedBox(height: 40),
                         _buildSectionHeader(context, "SYSTEM TELEMETRY"),

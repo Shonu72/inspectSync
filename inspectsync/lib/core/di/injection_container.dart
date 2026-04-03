@@ -66,6 +66,7 @@ Future<void> init() async {
     loginUseCase: sl(), 
     logoutUseCase: sl(),
     restoreSessionUseCase: sl(),
+    syncService: sl(),
   ));
   
   // Features - Sync & Tasks

@@ -59,6 +59,8 @@ dependencies:
   shared_preferences: ^2.5.5
   local_auth: ^3.0.1
   talker: ^4.9.3
+  geolocator: ^13.0.2
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:

@@ -97,7 +97,15 @@ class SyncService {
 
         final List<Map<String, dynamic>> changes = [];
         for (final item in queueItems) {
-          final payloadMap = jsonDecode(item.payload);
+          final payloadMap = Map<String, dynamic>.from(jsonDecode(item.payload));
+          
+          // Map internal priority int to backend enum strings
+          if (payloadMap.containsKey('priority')) {
+            final pInt = payloadMap['priority'] as int;
+            final pStr = pInt == 0 ? 'HIGH' : (pInt == 2 ? 'LOW' : 'MED');
+            payloadMap['priority'] = pStr;
+          }
+
           changes.add({
             'entityId': item.entityId,
             'entityType': item.entityType,
@@ -179,6 +187,10 @@ class SyncService {
           continue;
         }
 
+        // Map backend enum string back to internal int
+        final pStr = rawTask['priority']?.toString().toUpperCase() ?? 'MED';
+        final pInt = pStr == 'HIGH' ? 0 : (pStr == 'LOW' ? 2 : 1);
+
         // Map backend JSON to Drift Task
         final task = Task(
           id: taskId,
@@ -187,6 +199,7 @@ class SyncService {
           lat: (rawTask['lat']?.toDouble()),
           lng: (rawTask['lng']?.toDouble()),
           status: rawTask['status'] ?? 'pending',
+          priority: pInt,
           version: rawTask['version'] ?? 1,
           isSynced: true,
           updatedAt: DateTime.parse(rawTask['updatedAt']),

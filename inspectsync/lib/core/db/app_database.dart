@@ -18,7 +18,22 @@ class AppDatabase extends _$AppDatabase {
 
   // You should bump this number whenever you change or add a table definition.
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onCreate: (m) async {
+        await m.createAll();
+      },
+      onUpgrade: (m, from, to) async {
+        if (from < 2) {
+          // Add the priority column to the tasks table
+          await m.addColumn(tasks, tasks.priority);
+        }
+      },
+    );
+  }
 }
 
 LazyDatabase _openConnection() {
