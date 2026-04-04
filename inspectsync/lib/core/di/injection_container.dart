@@ -9,6 +9,7 @@ import '../network/connectivity_service.dart';
 import '../theme/theme_cubit.dart';
 import '../security/security_cubit.dart';
 import '../util/logger.dart';
+import '../services/media_service.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/login_usecase.dart';
 import '../../features/auth/domain/usecases/logout_usecase.dart';
@@ -48,6 +49,7 @@ Future<void> init() async {
   
   sl.registerLazySingleton(() => AppDatabase());
   sl.registerLazySingleton(() => ConnectivityService());
+  sl.registerLazySingleton(() => MediaService(sl()));
 
   // Features - Auth
   // DataSources

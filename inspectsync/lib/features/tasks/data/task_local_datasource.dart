@@ -19,6 +19,10 @@ class TaskLocalDataSource {
     return (_db.select(_db.tasks)..where((t) => t.id.equals(id))).getSingleOrNull();
   }
 
+  Stream<Task?> watchTaskById(String id) {
+    return (_db.select(_db.tasks)..where((t) => t.id.equals(id))).watchSingleOrNull();
+  }
+
   Future<void> updateTaskLocally(Task task) async {
     await _db.transaction(() async {
       final now = DateTime.now();
@@ -38,6 +42,7 @@ class TaskLocalDataSource {
         'updatedAt': updatedTask.updatedAt.toUtc().toIso8601String(),
         'lat': updatedTask.lat,
         'lng': updatedTask.lng,
+        'images': updatedTask.images,
       });
 
       await _db.into(_db.syncQueue).insert(SyncQueueCompanion.insert(
@@ -64,6 +69,7 @@ class TaskLocalDataSource {
         'updatedAt': task.updatedAt.toUtc().toIso8601String(),
         'lat': task.lat,
         'lng': task.lng,
+        'images': task.images,
       });
 
       await _db.into(_db.syncQueue).insert(SyncQueueCompanion.insert(

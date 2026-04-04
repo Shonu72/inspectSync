@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get_it/get_it.dart';
 import 'package:inspectsync/l10n/app_localizations.dart';
 import '../../data/task_repository.dart';
@@ -45,8 +46,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return FutureBuilder<Task?>(
-      future: GetIt.I<TaskRepository>().getTaskById(widget.taskId),
+    return StreamBuilder<Task?>(
+      stream: GetIt.I<TaskRepository>().watchTaskById(widget.taskId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
@@ -140,44 +141,56 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: AspectRatio(
-                                  aspectRatio: 1,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      image: const DecorationImage(
-                                        image: NetworkImage('https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=400&fit=crop'),
-                                        fit: BoxFit.cover,
-                                      ),
+                          if (task.images != null && task.images!.isNotEmpty)
+                            GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                                childAspectRatio: 1,
+                              ),
+                              itemCount: task.images!.split(',').length,
+                              itemBuilder: (context, index) {
+                                final imageUrl = task.images!.split(',')[index];
+                                return ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: CachedNetworkImage(
+                                    imageUrl: imageUrl,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => Container(
+                                      color: colorScheme.surfaceContainer,
+                                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
                                     ),
-                                    child: Stack(
-                                      children: [
-                                        Positioned(
-                                          top: 8,
-                                          right: 8,
-                                          child: CircleAvatar(
-                                            radius: 12,
-                                            backgroundColor: Colors.black.withValues(alpha: 0.5),
-                                            child: const Icon(Icons.delete_outline, color: Colors.white, size: 14),
-                                          ),
-                                        ),
-                                      ],
+                                    errorWidget: (context, url, error) => Container(
+                                      color: colorScheme.surfaceContainer,
+                                      child: const Icon(Icons.error_outline),
                                     ),
                                   ),
-                                ),
+                                );
+                              },
+                            )
+                          else
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(vertical: 40),
+                              decoration: BoxDecoration(
+                                color: colorScheme.surfaceContainer,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.1), style: BorderStyle.solid),
                               ),
-                              const SizedBox(width: 12),
-                              const Expanded(
-                                child: AspectRatio(
-                                  aspectRatio: 1,
-                                  child: Placeholder(), // Simplified for now
-                                ),
+                              child: Column(
+                                children: [
+                                  Icon(Icons.photo_library_outlined, color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3), size: 32),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'NO FIELD EVIDENCE COLLECTED',
+                                    style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5), letterSpacing: 1.0),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
                         ],
                       ),
                     ),

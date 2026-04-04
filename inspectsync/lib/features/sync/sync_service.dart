@@ -202,6 +202,7 @@ class SyncService {
           priority: pInt,
           version: rawTask['version'] ?? 1,
           isSynced: true,
+          images: rawTask['images'],
           updatedAt: DateTime.parse(rawTask['updatedAt']),
           createdAt: DateTime.parse(rawTask['createdAt']),
         );

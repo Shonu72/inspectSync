@@ -18,7 +18,7 @@ class AppDatabase extends _$AppDatabase {
 
   // You should bump this number whenever you change or add a table definition.
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration {
@@ -30,6 +30,10 @@ class AppDatabase extends _$AppDatabase {
         if (from < 2) {
           // Add the priority column to the tasks table
           await m.addColumn(tasks, tasks.priority);
+        }
+        if (from < 3) {
+          // Add the images column to the tasks table
+          await m.addColumn(tasks, tasks.images);
         }
       },
     );

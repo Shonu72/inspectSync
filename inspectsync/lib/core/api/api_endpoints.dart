@@ -12,4 +12,7 @@ class ApiEndpoints {
   // Sync
   static const String syncPush = '/sync/push';
   static const String syncPull = '/sync/pull';
+
+  // Media
+  static const String presignedUrl = '/media/presigned-url';
 }

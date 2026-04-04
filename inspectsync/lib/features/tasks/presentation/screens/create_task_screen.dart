@@ -1,8 +1,12 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get_it/get_it.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:inspectsync/features/tasks/data/task_repository.dart';
 import 'package:inspectsync/core/services/toast_service.dart';
+import 'package:inspectsync/core/services/media_service.dart';
+import 'package:image_picker/image_picker.dart';
 import '../widgets/location_picker_modal.dart';
 
 class CreateTaskScreen extends StatefulWidget {
@@ -22,6 +26,10 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   String _selectedCategory = 'Field Maintenance';
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = const TimeOfDay(hour: 8, minute: 0);
+  
+  // Stores mapping of { 'url': s3Url, 'localPath': localPath }
+  final List<Map<String, String>> _uploadedImageUrlsMap = [];
+  bool _isUploading = false;
   
   final List<String> _categories = [
     'Field Maintenance',
@@ -53,6 +61,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         priority: _selectedPriority,
         lat: _pickedLocation?.latitude,
         lng: _pickedLocation?.longitude,
+        images: _uploadedImageUrlsMap.map((e) => e['url']!).toList(),
       );
 
       ToastService.showSuccess('Task created and queued for sync');
@@ -346,47 +355,47 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
             borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
             child: Padding(
               padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainer,
-                    borderRadius: BorderRadius.circular(8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainer,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.location_on, color: colorScheme.primary, size: 18),
                   ),
-                  child: Icon(Icons.location_on, color: colorScheme.primary, size: 18),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'LOCATION',
-                        style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.5),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _locationController.text,
-                        style: TextStyle(
-                          color: _pickedLocation == null ? colorScheme.primary : colorScheme.onSurface, 
-                          fontSize: 15, 
-                          fontWeight: FontWeight.w600,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'LOCATION',
+                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.5),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 2),
+                        Text(
+                          _locationController.text,
+                          style: TextStyle(
+                            color: _pickedLocation == null ? colorScheme.primary : colorScheme.onSurface, 
+                            fontSize: 15, 
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Icon(Icons.map_rounded, color: colorScheme.primary.withValues(alpha: 0.5), size: 18),
-              ],
+                  Icon(Icons.map_rounded, color: colorScheme.primary.withValues(alpha: 0.5), size: 18),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
   // ─── Schedule Card ───────────────────────────────────────────
   Widget _buildScheduleCard(BuildContext context) {
@@ -469,6 +478,29 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     );
   }
 
+  Future<void> _pickAndUploadImage(ImageSource source) async {
+    final mediaService = GetIt.I<MediaService>();
+    final file = await mediaService.pickImage(source: source);
+    
+    if (file != null) {
+      setState(() => _isUploading = true);
+      final publicUrl = await mediaService.uploadImage(file);
+      setState(() => _isUploading = false);
+
+      if (publicUrl != null) {
+        setState(() {
+          _uploadedImageUrlsMap.add({
+            'url': publicUrl,
+            'localPath': file.path,
+          });
+        });
+        ToastService.showSuccess('Image uploaded successfully');
+      } else {
+        ToastService.showError('Image upload failed');
+      }
+    }
+  }
+
   // ─── Attachments ─────────────────────────────────────────────
   Widget _buildAttachmentsSection(BuildContext context, bool isDark) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -485,69 +517,189 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                 'INTELLIGENCE ATTACHMENTS',
                 style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.5),
               ),
-              Text(
-                'MAX 50MB',
-                style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
-              ),
+              if (_isUploading)
+                const SizedBox(
+                  width: 12,
+                  height: 12,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else
+                Text(
+                  '${_uploadedImageUrlsMap.length} ATTACHED',
+                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: colorScheme.primary),
+                ),
             ],
           ),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              // Add Media Tile
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerLowest,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.camera_alt_rounded, color: colorScheme.primary, size: 28),
-                        const SizedBox(height: 6),
-                        Text(
-                          'ADD MEDIA',
-                          style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.0),
-                        ),
-                      ],
+          
+          if (_uploadedImageUrlsMap.isNotEmpty)
+            SizedBox(
+              height: 100,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: _uploadedImageUrlsMap.length + 1,
+                separatorBuilder: (context, index) => const SizedBox(width: 12),
+                itemBuilder: (context, index) {
+                  if (index == _uploadedImageUrlsMap.length) {
+                    return _buildAddMoreTile(context);
+                  }
+                  return _buildImagePreviewTile(context, _uploadedImageUrlsMap[index]);
+                },
+              ),
+            )
+          else
+            Row(
+              children: [
+                // Add Media Tile
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _showImageSourcePicker(),
+                    child: Container(
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerLowest,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.camera_alt_rounded, color: colorScheme.primary, size: 28),
+                          const SizedBox(height: 6),
+                          Text(
+                            'ADD MEDIA',
+                            style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.0),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              // Document Tile
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerLowest,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.attach_file_rounded, color: colorScheme.primary, size: 28),
-                        const SizedBox(height: 6),
-                        Text(
-                          'ATTACH DOC',
-                          style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.0),
-                        ),
-                      ],
+                const SizedBox(width: 12),
+                // Document Tile
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerLowest,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.attach_file_rounded, color: colorScheme.primary, size: 28),
+                          const SizedBox(height: 6),
+                          Text(
+                            'ATTACH DOC',
+                            style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.0),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImagePreviewTile(BuildContext context, Map<String, String> item) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final localPath = item['localPath']!;
+    final url = item['url']!;
+
+    return Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
+      ),
+      child: Stack(
+        children: [
+          // Image Preview - Show local file for immediate feedback
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.file(
+                File(localPath),
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => CachedNetworkImage(
+                  imageUrl: url,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                  errorWidget: (context, url, err) => const Icon(Icons.error_outline),
+                ),
               ),
-            ],
+            ),
+          ),
+          // Delete Button
+          Positioned(
+            top: 4,
+            right: 4,
+            child: GestureDetector(
+              onTap: () => setState(() => _uploadedImageUrlsMap.remove(item)),
+              child: CircleAvatar(
+                radius: 10,
+                backgroundColor: Colors.black.withValues(alpha: 0.6),
+                child: const Icon(Icons.close, color: Colors.white, size: 12),
+              ),
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAddMoreTile(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return GestureDetector(
+      onTap: () => _showImageSourcePicker(),
+      child: Container(
+        width: 100,
+        height: 100,
+        decoration: BoxDecoration(
+          color: colorScheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3), style: BorderStyle.solid),
+        ),
+        child: Icon(Icons.add_a_photo_rounded, color: colorScheme.primary, size: 24),
+      ),
+    );
+  }
+
+  void _showImageSourcePicker() {
+    final colorScheme = Theme.of(context).colorScheme;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: colorScheme.surfaceContainerLowest,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Camera'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickAndUploadImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Gallery'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickAndUploadImage(ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

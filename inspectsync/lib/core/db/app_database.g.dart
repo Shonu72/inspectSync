@@ -88,6 +88,15 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     requiredDuringInsert: false,
     defaultValue: const Constant(1),
   );
+  static const VerificationMeta _imagesMeta = const VerificationMeta('images');
+  @override
+  late final GeneratedColumn<String> images = GeneratedColumn<String>(
+    'images',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _isSyncedMeta = const VerificationMeta(
     'isSynced',
   );
@@ -135,6 +144,7 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     status,
     priority,
     version,
+    images,
     isSynced,
     updatedAt,
     createdAt,
@@ -205,6 +215,12 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         version.isAcceptableOrUnknown(data['version']!, _versionMeta),
       );
     }
+    if (data.containsKey('images')) {
+      context.handle(
+        _imagesMeta,
+        images.isAcceptableOrUnknown(data['images']!, _imagesMeta),
+      );
+    }
     if (data.containsKey('is_synced')) {
       context.handle(
         _isSyncedMeta,
@@ -268,6 +284,10 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         DriftSqlType.int,
         data['${effectivePrefix}version'],
       )!,
+      images: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}images'],
+      ),
       isSynced: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_synced'],
@@ -298,6 +318,7 @@ class Task extends DataClass implements Insertable<Task> {
   final String status;
   final int priority;
   final int version;
+  final String? images;
   final bool isSynced;
   final DateTime updatedAt;
   final DateTime createdAt;
@@ -310,6 +331,7 @@ class Task extends DataClass implements Insertable<Task> {
     required this.status,
     required this.priority,
     required this.version,
+    this.images,
     required this.isSynced,
     required this.updatedAt,
     required this.createdAt,
@@ -331,6 +353,9 @@ class Task extends DataClass implements Insertable<Task> {
     map['status'] = Variable<String>(status);
     map['priority'] = Variable<int>(priority);
     map['version'] = Variable<int>(version);
+    if (!nullToAbsent || images != null) {
+      map['images'] = Variable<String>(images);
+    }
     map['is_synced'] = Variable<bool>(isSynced);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     map['created_at'] = Variable<DateTime>(createdAt);
@@ -349,6 +374,9 @@ class Task extends DataClass implements Insertable<Task> {
       status: Value(status),
       priority: Value(priority),
       version: Value(version),
+      images: images == null && nullToAbsent
+          ? const Value.absent()
+          : Value(images),
       isSynced: Value(isSynced),
       updatedAt: Value(updatedAt),
       createdAt: Value(createdAt),
@@ -369,6 +397,7 @@ class Task extends DataClass implements Insertable<Task> {
       status: serializer.fromJson<String>(json['status']),
       priority: serializer.fromJson<int>(json['priority']),
       version: serializer.fromJson<int>(json['version']),
+      images: serializer.fromJson<String?>(json['images']),
       isSynced: serializer.fromJson<bool>(json['isSynced']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -386,6 +415,7 @@ class Task extends DataClass implements Insertable<Task> {
       'status': serializer.toJson<String>(status),
       'priority': serializer.toJson<int>(priority),
       'version': serializer.toJson<int>(version),
+      'images': serializer.toJson<String?>(images),
       'isSynced': serializer.toJson<bool>(isSynced),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -401,6 +431,7 @@ class Task extends DataClass implements Insertable<Task> {
     String? status,
     int? priority,
     int? version,
+    Value<String?> images = const Value.absent(),
     bool? isSynced,
     DateTime? updatedAt,
     DateTime? createdAt,
@@ -413,6 +444,7 @@ class Task extends DataClass implements Insertable<Task> {
     status: status ?? this.status,
     priority: priority ?? this.priority,
     version: version ?? this.version,
+    images: images.present ? images.value : this.images,
     isSynced: isSynced ?? this.isSynced,
     updatedAt: updatedAt ?? this.updatedAt,
     createdAt: createdAt ?? this.createdAt,
@@ -429,6 +461,7 @@ class Task extends DataClass implements Insertable<Task> {
       status: data.status.present ? data.status.value : this.status,
       priority: data.priority.present ? data.priority.value : this.priority,
       version: data.version.present ? data.version.value : this.version,
+      images: data.images.present ? data.images.value : this.images,
       isSynced: data.isSynced.present ? data.isSynced.value : this.isSynced,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -446,6 +479,7 @@ class Task extends DataClass implements Insertable<Task> {
           ..write('status: $status, ')
           ..write('priority: $priority, ')
           ..write('version: $version, ')
+          ..write('images: $images, ')
           ..write('isSynced: $isSynced, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('createdAt: $createdAt')
@@ -463,6 +497,7 @@ class Task extends DataClass implements Insertable<Task> {
     status,
     priority,
     version,
+    images,
     isSynced,
     updatedAt,
     createdAt,
@@ -479,6 +514,7 @@ class Task extends DataClass implements Insertable<Task> {
           other.status == this.status &&
           other.priority == this.priority &&
           other.version == this.version &&
+          other.images == this.images &&
           other.isSynced == this.isSynced &&
           other.updatedAt == this.updatedAt &&
           other.createdAt == this.createdAt);
@@ -493,6 +529,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
   final Value<String> status;
   final Value<int> priority;
   final Value<int> version;
+  final Value<String?> images;
   final Value<bool> isSynced;
   final Value<DateTime> updatedAt;
   final Value<DateTime> createdAt;
@@ -506,6 +543,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.status = const Value.absent(),
     this.priority = const Value.absent(),
     this.version = const Value.absent(),
+    this.images = const Value.absent(),
     this.isSynced = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -520,6 +558,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     required String status,
     this.priority = const Value.absent(),
     this.version = const Value.absent(),
+    this.images = const Value.absent(),
     this.isSynced = const Value.absent(),
     required DateTime updatedAt,
     required DateTime createdAt,
@@ -538,6 +577,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Expression<String>? status,
     Expression<int>? priority,
     Expression<int>? version,
+    Expression<String>? images,
     Expression<bool>? isSynced,
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? createdAt,
@@ -552,6 +592,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       if (status != null) 'status': status,
       if (priority != null) 'priority': priority,
       if (version != null) 'version': version,
+      if (images != null) 'images': images,
       if (isSynced != null) 'is_synced': isSynced,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (createdAt != null) 'created_at': createdAt,
@@ -568,6 +609,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Value<String>? status,
     Value<int>? priority,
     Value<int>? version,
+    Value<String?>? images,
     Value<bool>? isSynced,
     Value<DateTime>? updatedAt,
     Value<DateTime>? createdAt,
@@ -582,6 +624,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       status: status ?? this.status,
       priority: priority ?? this.priority,
       version: version ?? this.version,
+      images: images ?? this.images,
       isSynced: isSynced ?? this.isSynced,
       updatedAt: updatedAt ?? this.updatedAt,
       createdAt: createdAt ?? this.createdAt,
@@ -616,6 +659,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (version.present) {
       map['version'] = Variable<int>(version.value);
     }
+    if (images.present) {
+      map['images'] = Variable<String>(images.value);
+    }
     if (isSynced.present) {
       map['is_synced'] = Variable<bool>(isSynced.value);
     }
@@ -642,6 +688,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
           ..write('status: $status, ')
           ..write('priority: $priority, ')
           ..write('version: $version, ')
+          ..write('images: $images, ')
           ..write('isSynced: $isSynced, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('createdAt: $createdAt, ')
@@ -1574,6 +1621,7 @@ typedef $$TasksTableCreateCompanionBuilder =
       required String status,
       Value<int> priority,
       Value<int> version,
+      Value<String?> images,
       Value<bool> isSynced,
       required DateTime updatedAt,
       required DateTime createdAt,
@@ -1589,6 +1637,7 @@ typedef $$TasksTableUpdateCompanionBuilder =
       Value<String> status,
       Value<int> priority,
       Value<int> version,
+      Value<String?> images,
       Value<bool> isSynced,
       Value<DateTime> updatedAt,
       Value<DateTime> createdAt,
@@ -1640,6 +1689,11 @@ class $$TasksTableFilterComposer extends Composer<_$AppDatabase, $TasksTable> {
 
   ColumnFilters<int> get version => $composableBuilder(
     column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get images => $composableBuilder(
+    column: $table.images,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1708,6 +1762,11 @@ class $$TasksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get images => $composableBuilder(
+    column: $table.images,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get isSynced => $composableBuilder(
     column: $table.isSynced,
     builder: (column) => ColumnOrderings(column),
@@ -1759,6 +1818,9 @@ class $$TasksTableAnnotationComposer
   GeneratedColumn<int> get version =>
       $composableBuilder(column: $table.version, builder: (column) => column);
 
+  GeneratedColumn<String> get images =>
+      $composableBuilder(column: $table.images, builder: (column) => column);
+
   GeneratedColumn<bool> get isSynced =>
       $composableBuilder(column: $table.isSynced, builder: (column) => column);
 
@@ -1805,6 +1867,7 @@ class $$TasksTableTableManager
                 Value<String> status = const Value.absent(),
                 Value<int> priority = const Value.absent(),
                 Value<int> version = const Value.absent(),
+                Value<String?> images = const Value.absent(),
                 Value<bool> isSynced = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -1818,6 +1881,7 @@ class $$TasksTableTableManager
                 status: status,
                 priority: priority,
                 version: version,
+                images: images,
                 isSynced: isSynced,
                 updatedAt: updatedAt,
                 createdAt: createdAt,
@@ -1833,6 +1897,7 @@ class $$TasksTableTableManager
                 required String status,
                 Value<int> priority = const Value.absent(),
                 Value<int> version = const Value.absent(),
+                Value<String?> images = const Value.absent(),
                 Value<bool> isSynced = const Value.absent(),
                 required DateTime updatedAt,
                 required DateTime createdAt,
@@ -1846,6 +1911,7 @@ class $$TasksTableTableManager
                 status: status,
                 priority: priority,
                 version: version,
+                images: images,
                 isSynced: isSynced,
                 updatedAt: updatedAt,
                 createdAt: createdAt,

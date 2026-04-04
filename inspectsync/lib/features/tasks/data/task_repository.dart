@@ -25,6 +25,11 @@ class TaskRepository {
     return local.getTaskById(id);
   }
 
+  /// Watch a single task by ID for reactive UI
+  Stream<Task?> watchTaskById(String id) {
+    return local.watchTaskById(id);
+  }
+
   /// Create a new task offline-first
   Future<void> createTask({
     required String title,
@@ -32,6 +37,7 @@ class TaskRepository {
     double? lat,
     double? lng,
     int priority = 1, // Default to MED
+    List<String>? images,
   }) async {
     final now = DateTime.now();
     final task = Task(
@@ -42,6 +48,7 @@ class TaskRepository {
       lng: lng,
       status: 'pending',
       priority: priority,
+      images: images?.join(','),
       version: 1,
       isSynced: false,
       updatedAt: now,
