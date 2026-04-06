@@ -18,15 +18,16 @@ InspectSync is a Flutter-based mobile application designed for field engineers t
 | **Conflict Resolution** | ✅ Completed | 95% |
 | **Connectivity Telemetry** | ✅ Completed | 100% |
 | **Create Task Flow** | ✅ Completed | 100% |
+| **Secure Media Sync** | ✅ Completed | 100% |
 | **Design System (Theming)** | ✅ Completed | 100% |
 | **User Profile & Settings** | ✅ Completed | 100% |
-| **Localization (i18n)** | ✅ Completed | 90% |
-| **Backend API Integration** | ✅ Progressing | 80% |
+| **Localization (i18n)** | ✅ Completed | 95% |
+| **Backend API Integration** | ✅ Completed | 100% |
 
-**Overall Progress: ~85%**
+**Overall Progress: ~95%**
 
 ```
-███████████████████████████░░░  85%
+██████████████████████████████░  95%
 ```
 ---
 
@@ -34,12 +35,13 @@ InspectSync is a Flutter-based mobile application designed for field engineers t
 
 The application is structured into several high-performance modules, each handling a specific domain of field operations:
 
-- **🔑 Authentication & Identity**: Manages secure engineer onboarding via JWT, persistent session handling, and biometric hardware verification (FaceID/Fingerprint).
-- **📡 Strategic Sync Engine**: The core heartbeat of the app. Features an optimistic offline-first architecture with a reactive SQLite queue, change tracking, and an isolated background routine for data reconciliation.
-- **📋 Task & Directive Management**: Handles the full lifecycle of field assignments—from priority-based creation and protocol definition to real-time execution tracking (Elapsed Time & Progress).
-- **📊 Command Dashboard**: A high-fidelity telemetry interface providing an at-a-glance view of sync health, daily mission velocity, and prioritized operation lists.
-- **🗺️ Geospatial Intelligence (Map)**: Interactive mapping layer featuring **Marker Clustering** for high-density task areas and tactical **Pointer Markers**.
-- **📡 Signal Integrity Telemetry**: Enhanced connectivity monitoring that measures real-time latency (ms) and estimated uplink speed (Mbps) across network types.
+- **🔑 Authentication & Identity**: Manages secure engineer onboarding via JWT, persistent session handling, and biometric hardware verification.
+- **📡 Strategic Sync Engine**: Optimistic offline-first architecture with a reactive SQLite queue, change tracking, and background reconciliation.
+- **🛡️ Secure Media Integrity**: Hybrid media pipeline that uploads field evidence to **Private S3 Buckets**. Features **Local-Path Previews** for instant feedback and **Presigned GET URLs** for secure remote viewing.
+- **📋 Task & Directive Management**: Reactive task lifecycle management using **Streams** for real-time data updates during background sync.
+- **📊 Command Dashboard**: High-fidelity telemetry interface providing an at-a-glance view of sync health and daily mission velocity.
+- **🗺️ Geospatial Intelligence (Map)**: Interactive mapping layer featuring Marker Clustering and tactical Pointer Markers.
+- **📡 Signal Integrity Telemetry**: Real-time latency (ms) and uplink speed (Mbps) monitoring across network types.
 
 ---
 
@@ -142,23 +144,26 @@ InspectSync implements a **dual-mode design system** called the **"Tactical Arch
 - Each task card supports full-card tap navigation to details
 
 ### 4. Task Details Screen (Tactical Interface)
+- **Reactive UI**: Implements **`StreamBuilder`** to watch tasks by ID. This ensures the UI reflects background sync updates (like presigned image URLs) in real-time.
 - **Mission Header**: Project ID, task title, location sector.
 - **Operational Checklist**: Interactive toggle items with real-time progress tracking.
-- **Field Evidence Section**: Photo grid with capture button (camera integration stub).
+- **Secure Field Evidence**: High-fidelity media grid featuring **`CachedNetworkImage`** for encrypted retrieval from private storage.
 - **Tactical Notes**: Multi-line text input for site observations.
 - **Sticky Footer**: 
-  - **Live Session Timer**: Shows **"Time on Site"** tracked since the screen was opened, providing accurate field duration telemetry.
+  - **Live Session Timer**: Shows **"Time on Site"** tracked since the screen was opened.
   - **Dynamic Progress**: Real-time completion percentage based on checklist status.
-  - **Submit Button**: Finalizes the local report.
+  - **Submit Button**: Finalizes the local report and triggers sync.
 
 ### 5. Create Task Screen
-- **Priority Toggle**: Animated HIGH / MED / LOW selector with color feedback
-- **Task Title & Protocol**: Free-form input card for task definition
-- **Category Picker**: Bottom sheet selector (Field Maintenance, Infrastructure Audit, Sensor Calibration, Emergency Repair, Routine Inspection)
-- **Location Display**: Pre-filled zone/sector reference
-- **Schedule Card**: Native date and time pickers with blue accent tint
-- **Intelligence Attachments**: Media capture and document upload tiles (stubs)
-- **"Execute Creation"** button with title validation
+- **Priority Toggle**: Animated HIGH / MED / LOW selector with color feedback.
+- **Task Title & Protocol**: Free-form input card for task definition.
+- **Category Picker**: Bottom sheet selector with tactical categories.
+- **Location Display**: Pre-filled zone/sector reference.
+- **Schedule Card**: Native date and time pickers with theme-aware styling.
+- **Hybrid Intelligence Attachments**: 
+  - **Instant Feedback**: Uses local file paths for immediate UI previews.
+  - **Secure Storage**: Uploads field evidence to private S3 buckets via presigned PUT.
+- **"Execute Creation"** button with full form validation.
 
 ### 6. Map Screen
 - **Marker Clustering**: Automatically groups nearby tasks to prevent visual overlap.
@@ -371,11 +376,13 @@ dart run build_runner build --delete-conflicting-outputs
 - [x] Auto-sync on reconnect
 - [x] Sync progress streaming
 
-### Phase D — Production Readiness 🔲
-- [ ] Backend API integration (replace stubs)
-- [ ] Camera & file upload for field evidence
-- [ ] Time-on-site tracking service
-- [ ] User profile & settings screen
+### Phase D — Production Readiness ✅
+- [x] Backend API integration (Real REST API)
+- [x] Camera & file upload for field evidence
+- [x] Secure S3 Private Media Storage
+- [x] Time-on-site tracking service
+- [x] User profile & settings screen
+- [x] Theme-aware design across 100% of screens
 - [ ] Push notifications for task assignments
 - [ ] Admin/supervisor desktop dashboard
 - [ ] Unit & integration test suite
