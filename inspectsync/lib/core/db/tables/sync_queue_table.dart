@@ -17,4 +17,5 @@ class SyncQueue extends Table {
       integer().withDefault(const Constant(0))();
 
   DateTimeColumn get createdAt => dateTime()();
+  TextColumn get idempotencyKey => text().nullable()();
 }

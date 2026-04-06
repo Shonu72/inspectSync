@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:drift/drift.dart';
 import '../../../core/db/app_database.dart';
+import 'package:uuid/uuid.dart';
 
 class TaskLocalDataSource {
   final AppDatabase _db;
@@ -51,6 +52,7 @@ class TaskLocalDataSource {
             action: 'update',
             payload: payload,
             createdAt: now,
+            idempotencyKey: Value(const Uuid().v4()),
           ));
     });
   }
@@ -78,6 +80,7 @@ class TaskLocalDataSource {
             action: 'create',
             payload: payload,
             createdAt: DateTime.now(),
+            idempotencyKey: Value(const Uuid().v4()),
           ));
     });
   }

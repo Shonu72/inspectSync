@@ -10,6 +10,8 @@ import '../../features/tasks/data/task_remote_datasource.dart';
 import '../../core/network/connectivity_service.dart';
 import 'conflict_resolver.dart';
 import 'sync_queue_manager.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'dart:io';
 
 class SyncProgress {
   final int totalItems;
@@ -111,7 +113,7 @@ class SyncService {
             'entityType': item.entityType,
             'operation': item.action,
             'payload': payloadMap,
-            'idempotencyKey': 'sync-${item.id}-${item.createdAt.millisecondsSinceEpoch}',
+            'idempotencyKey': item.idempotencyKey ?? 'backup-${item.id}-${item.createdAt.millisecondsSinceEpoch}',
             'clientVersion': payloadMap['version'] ?? 1,
           });
         }
@@ -245,7 +247,19 @@ class SyncService {
   }
 
   Future<String> _getDeviceId() async {
-    return 'device-flutter-v1';
+    try {
+      final deviceInfo = DeviceInfoPlugin();
+      if (Platform.isAndroid) {
+        final androidInfo = await deviceInfo.androidInfo;
+        return androidInfo.id; // Unique ID on Android
+      } else if (Platform.isIOS) {
+        final iosInfo = await deviceInfo.iosInfo;
+        return iosInfo.identifierForVendor ?? 'ios-device'; // Unique ID on iOS
+      }
+    } catch (e) {
+      debugPrint('SyncService: Failed to get device ID: $e');
+    }
+    return 'device-fallback-v1';
   }
 
   void dispose() {
