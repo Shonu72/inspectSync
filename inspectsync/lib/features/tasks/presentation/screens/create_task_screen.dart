@@ -19,18 +19,20 @@ class CreateTaskScreen extends StatefulWidget {
 class _CreateTaskScreenState extends State<CreateTaskScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _locationController = TextEditingController(text: 'SELECT MISSION SITE');
+  final _locationController = TextEditingController(
+    text: 'SELECT MISSION SITE',
+  );
   LatLng? _pickedLocation;
-  
+
   int _selectedPriority = 1; // Default to Medium
   String _selectedCategory = 'Field Maintenance';
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = const TimeOfDay(hour: 8, minute: 0);
-  
+
   // Stores mapping of { 'url': s3Url, 'localPath': localPath }
   final List<Map<String, String>> _uploadedImageUrlsMap = [];
   bool _isUploading = false;
-  
+
   final List<String> _categories = [
     'Field Maintenance',
     'Infrastructure Audit',
@@ -86,7 +88,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
           onPressed: () => Navigator.pop(context),
           child: Text(
             'Cancel',
-            style: TextStyle(color: colorScheme.primary, fontSize: 14, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              color: colorScheme.primary,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
         leadingWidth: 80,
@@ -100,7 +106,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
             onPressed: _saveTask,
             child: Text(
               'Save',
-              style: TextStyle(color: colorScheme.primary, fontSize: 14, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: colorScheme.primary,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -135,34 +145,34 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Priority Selector
             _buildPrioritySelector(context),
-            
+
             const SizedBox(height: 28),
-            
+
             // Task Title & Description Card
             _buildInputCard(context, isDark),
-            
+
             const SizedBox(height: 16),
-            
+
             // Category & Location Card
             _buildMetaCard(context, isDark),
-            
+
             const SizedBox(height: 16),
-            
+
             // Date & Time Card
             _buildScheduleCard(context),
-            
+
             const SizedBox(height: 28),
-            
+
             // Attachments Section
             _buildAttachmentsSection(context, isDark),
-            
+
             const SizedBox(height: 32),
-            
+
             // Submit Button
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 48),
@@ -174,12 +184,18 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                     elevation: 0,
                   ),
                   child: const Text(
                     'EXECUTE CREATION',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, letterSpacing: 1.0),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.0,
+                    ),
                   ),
                 ),
               ),
@@ -194,7 +210,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   Widget _buildPrioritySelector(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final labels = ['HIGH', 'MED', 'LOW'];
-    final colors = [const Color(0xFFD32F2F), const Color(0xFFF57C00), const Color(0xFF388E3C)];
+    final colors = [
+      const Color(0xFFD32F2F),
+      const Color(0xFFF57C00),
+      const Color(0xFF388E3C),
+    ];
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -203,7 +223,12 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         children: [
           Text(
             'SET URGENCY',
-            style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.5),
+            style: TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.w900,
+              color: colorScheme.onSurfaceVariant,
+              letterSpacing: 1.5,
+            ),
           ),
           const SizedBox(height: 10),
           Row(
@@ -216,12 +241,19 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                   onTap: () => setState(() => _selectedPriority = index),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
-                      color: isSelected ? colors[index] : colorScheme.surfaceContainer,
+                      color: isSelected
+                          ? colors[index]
+                          : colorScheme.surfaceContainer,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isSelected ? colors[index] : colorScheme.outlineVariant,
+                        color: isSelected
+                            ? colors[index]
+                            : colorScheme.outlineVariant,
                         width: 1,
                       ),
                     ),
@@ -230,7 +262,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w900,
-                        color: isSelected ? Colors.white : colorScheme.onSurfaceVariant,
+                        color: isSelected
+                            ? Colors.white
+                            : colorScheme.onSurfaceVariant,
                         letterSpacing: 1.0,
                       ),
                     ),
@@ -260,33 +294,59 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         children: [
           Text(
             'TASK TITLE',
-            style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.5),
+            style: TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.w900,
+              color: colorScheme.onSurfaceVariant,
+              letterSpacing: 1.5,
+            ),
           ),
           TextField(
             controller: _titleController,
-            style: TextStyle(color: colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              color: colorScheme.onSurface,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
             decoration: InputDecoration(
               hintText: 'e.g. Infrastructure Diagnostic',
-              hintStyle: TextStyle(color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5), fontSize: 16),
+              hintStyle: TextStyle(
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                fontSize: 16,
+              ),
               border: InputBorder.none,
               filled: false,
               contentPadding: const EdgeInsets.symmetric(vertical: 8),
             ),
           ),
           const SizedBox(height: 8),
-          Divider(height: 1, color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
+          Divider(
+            height: 1,
+            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+          ),
           const SizedBox(height: 16),
           Text(
             'DETAILED PROTOCOL',
-            style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.5),
+            style: TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.w900,
+              color: colorScheme.onSurfaceVariant,
+              letterSpacing: 1.5,
+            ),
           ),
           TextField(
             controller: _descriptionController,
-            style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.8), fontSize: 14),
+            style: TextStyle(
+              color: colorScheme.onSurface.withValues(alpha: 0.8),
+              fontSize: 14,
+            ),
             maxLines: 4,
             decoration: InputDecoration(
               hintText: 'Describe the tactical requirements...',
-              hintStyle: TextStyle(color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5), fontSize: 14),
+              hintStyle: TextStyle(
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                fontSize: 14,
+              ),
               border: InputBorder.none,
               filled: false,
               contentPadding: const EdgeInsets.symmetric(vertical: 8),
@@ -324,7 +384,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                       color: colorScheme.surfaceContainer,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(Icons.settings_rounded, color: colorScheme.onSurfaceVariant, size: 18),
+                    child: Icon(
+                      Icons.settings_rounded,
+                      color: colorScheme.onSurfaceVariant,
+                      size: 18,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -333,26 +397,44 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                       children: [
                         Text(
                           'CATEGORY',
-                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.5),
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w900,
+                            color: colorScheme.onSurfaceVariant,
+                            letterSpacing: 1.5,
+                          ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           _selectedCategory,
-                          style: TextStyle(color: colorScheme.onSurface, fontSize: 15, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            color: colorScheme.onSurface,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  Icon(Icons.keyboard_arrow_down_rounded, color: colorScheme.onSurfaceVariant, size: 24),
+                  Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: colorScheme.onSurfaceVariant,
+                    size: 24,
+                  ),
                 ],
               ),
             ),
           ),
-          Divider(height: 1, color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
+          Divider(
+            height: 1,
+            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+          ),
           // Location Row
           InkWell(
             onTap: _pickLocationMode,
-            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(16),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -364,7 +446,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                       color: colorScheme.surfaceContainer,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(Icons.location_on, color: colorScheme.primary, size: 18),
+                    child: Icon(
+                      Icons.location_on,
+                      color: colorScheme.primary,
+                      size: 18,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -373,21 +459,32 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                       children: [
                         Text(
                           'LOCATION',
-                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.5),
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w900,
+                            color: colorScheme.onSurfaceVariant,
+                            letterSpacing: 1.5,
+                          ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           _locationController.text,
                           style: TextStyle(
-                            color: _pickedLocation == null ? colorScheme.primary : colorScheme.onSurface, 
-                            fontSize: 15, 
+                            color: _pickedLocation == null
+                                ? colorScheme.primary
+                                : colorScheme.onSurface,
+                            fontSize: 15,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Icon(Icons.map_rounded, color: colorScheme.primary.withValues(alpha: 0.5), size: 18),
+                  Icon(
+                    Icons.map_rounded,
+                    color: colorScheme.primary.withValues(alpha: 0.5),
+                    size: 18,
+                  ),
                 ],
               ),
             ),
@@ -400,7 +497,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   // ─── Schedule Card ───────────────────────────────────────────
   Widget _buildScheduleCard(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
@@ -418,7 +515,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               padding: const EdgeInsets.all(20),
               child: Row(
                 children: [
-                  Icon(Icons.calendar_today_rounded, color: colorScheme.primary, size: 18),
+                  Icon(
+                    Icons.calendar_today_rounded,
+                    color: colorScheme.primary,
+                    size: 18,
+                  ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
@@ -426,17 +527,30 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                       children: [
                         Text(
                           'SCHEDULED DATE',
-                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.5),
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w900,
+                            color: colorScheme.onSurfaceVariant,
+                            letterSpacing: 1.5,
+                          ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           '${_selectedDate.month.toString().padLeft(2, '0')}/${_selectedDate.day.toString().padLeft(2, '0')}/${_selectedDate.year}',
-                          style: TextStyle(color: colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.w700),
+                          style: TextStyle(
+                            color: colorScheme.onSurface,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  Icon(Icons.edit_calendar, color: colorScheme.primary.withValues(alpha: 0.5), size: 20),
+                  Icon(
+                    Icons.edit_calendar,
+                    color: colorScheme.primary.withValues(alpha: 0.5),
+                    size: 20,
+                  ),
                 ],
               ),
             ),
@@ -445,12 +559,18 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
           // Time Row
           InkWell(
             onTap: _pickTime,
-            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(16),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
                 children: [
-                  Icon(Icons.schedule_rounded, color: colorScheme.primary, size: 18),
+                  Icon(
+                    Icons.schedule_rounded,
+                    color: colorScheme.primary,
+                    size: 18,
+                  ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
@@ -458,17 +578,30 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                       children: [
                         Text(
                           'LAUNCH TIME',
-                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.5),
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w900,
+                            color: colorScheme.onSurfaceVariant,
+                            letterSpacing: 1.5,
+                          ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           _selectedTime.format(context),
-                          style: TextStyle(color: colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.w700),
+                          style: TextStyle(
+                            color: colorScheme.onSurface,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  Icon(Icons.access_time, color: colorScheme.primary.withValues(alpha: 0.5), size: 20),
+                  Icon(
+                    Icons.access_time,
+                    color: colorScheme.primary.withValues(alpha: 0.5),
+                    size: 20,
+                  ),
                 ],
               ),
             ),
@@ -481,7 +614,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   Future<void> _pickAndUploadImage(ImageSource source) async {
     final mediaService = GetIt.I<MediaService>();
     final file = await mediaService.pickImage(source: source);
-    
+
     if (file != null) {
       setState(() => _isUploading = true);
       final publicUrl = await mediaService.uploadImage(file);
@@ -489,10 +622,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
 
       if (publicUrl != null) {
         setState(() {
-          _uploadedImageUrlsMap.add({
-            'url': publicUrl,
-            'localPath': file.path,
-          });
+          _uploadedImageUrlsMap.add({'url': publicUrl, 'localPath': file.path});
         });
         ToastService.showSuccess('Image uploaded successfully');
       } else {
@@ -515,7 +645,12 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
             children: [
               Text(
                 'INTELLIGENCE ATTACHMENTS',
-                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.5),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  color: colorScheme.onSurfaceVariant,
+                  letterSpacing: 1.5,
+                ),
               ),
               if (_isUploading)
                 const SizedBox(
@@ -526,12 +661,16 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               else
                 Text(
                   '${_uploadedImageUrlsMap.length} ATTACHED',
-                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: colorScheme.primary),
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                    color: colorScheme.primary,
+                  ),
                 ),
             ],
           ),
           const SizedBox(height: 16),
-          
+
           if (_uploadedImageUrlsMap.isNotEmpty)
             SizedBox(
               height: 100,
@@ -543,7 +682,10 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                   if (index == _uploadedImageUrlsMap.length) {
                     return _buildAddMoreTile(context);
                   }
-                  return _buildImagePreviewTile(context, _uploadedImageUrlsMap[index]);
+                  return _buildImagePreviewTile(
+                    context,
+                    _uploadedImageUrlsMap[index],
+                  );
                 },
               ),
             )
@@ -559,16 +701,29 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                       decoration: BoxDecoration(
                         color: colorScheme.surfaceContainerLowest,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
+                        border: Border.all(
+                          color: colorScheme.outlineVariant.withValues(
+                            alpha: 0.3,
+                          ),
+                        ),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.camera_alt_rounded, color: colorScheme.primary, size: 28),
+                          Icon(
+                            Icons.camera_alt_rounded,
+                            color: colorScheme.primary,
+                            size: 28,
+                          ),
                           const SizedBox(height: 6),
                           Text(
                             'ADD MEDIA',
-                            style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.0),
+                            style: TextStyle(
+                              fontSize: 8,
+                              fontWeight: FontWeight.w900,
+                              color: colorScheme.onSurfaceVariant,
+                              letterSpacing: 1.0,
+                            ),
                           ),
                         ],
                       ),
@@ -585,16 +740,29 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                       decoration: BoxDecoration(
                         color: colorScheme.surfaceContainerLowest,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
+                        border: Border.all(
+                          color: colorScheme.outlineVariant.withValues(
+                            alpha: 0.3,
+                          ),
+                        ),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.attach_file_rounded, color: colorScheme.primary, size: 28),
+                          Icon(
+                            Icons.attach_file_rounded,
+                            color: colorScheme.primary,
+                            size: 28,
+                          ),
                           const SizedBox(height: 6),
                           Text(
                             'ATTACH DOC',
-                            style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.0),
+                            style: TextStyle(
+                              fontSize: 8,
+                              fontWeight: FontWeight.w900,
+                              color: colorScheme.onSurfaceVariant,
+                              letterSpacing: 1.0,
+                            ),
                           ),
                         ],
                       ),
@@ -608,7 +776,10 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     );
   }
 
-  Widget _buildImagePreviewTile(BuildContext context, Map<String, String> item) {
+  Widget _buildImagePreviewTile(
+    BuildContext context,
+    Map<String, String> item,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final localPath = item['localPath']!;
     final url = item['url']!;
@@ -618,7 +789,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       height: 100,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+        ),
       ),
       child: Stack(
         children: [
@@ -629,12 +802,16 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               child: Image.file(
                 File(localPath),
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => CachedNetworkImage(
-                  imageUrl: url,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                  errorWidget: (context, url, err) => const Icon(Icons.error_outline),
-                ),
+                errorBuilder: (context, error, stackTrace) =>
+                    CachedNetworkImage(
+                      imageUrl: url,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      errorWidget: (context, url, err) =>
+                          const Icon(Icons.error_outline),
+                    ),
               ),
             ),
           ),
@@ -666,9 +843,16 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.3), style: BorderStyle.solid),
+          border: Border.all(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+            style: BorderStyle.solid,
+          ),
         ),
-        child: Icon(Icons.add_a_photo_rounded, color: colorScheme.primary, size: 24),
+        child: Icon(
+          Icons.add_a_photo_rounded,
+          color: colorScheme.primary,
+          size: 24,
+        ),
       ),
     );
   }
@@ -720,23 +904,46 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 12),
-              Container(width: 40, height: 4, decoration: BoxDecoration(color: colorScheme.outlineVariant, borderRadius: BorderRadius.circular(2))),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: colorScheme.outlineVariant,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
               const SizedBox(height: 20),
-              Text('SELECT CATEGORY', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant, letterSpacing: 1.5)),
+              Text(
+                'SELECT CATEGORY',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w900,
+                  color: colorScheme.onSurfaceVariant,
+                  letterSpacing: 1.5,
+                ),
+              ),
               const SizedBox(height: 16),
               ..._categories.map((cat) {
                 final isSelected = _selectedCategory == cat;
                 return ListTile(
                   leading: Icon(
-                    isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-                    color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                    isSelected
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_off,
+                    color: isSelected
+                        ? colorScheme.primary
+                        : colorScheme.onSurfaceVariant,
                     size: 20,
                   ),
                   title: Text(
                     cat,
                     style: TextStyle(
-                      color: isSelected ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected
+                          ? colorScheme.onSurface
+                          : colorScheme.onSurfaceVariant,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
                   ),
                   onTap: () {
@@ -782,7 +989,8 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     if (picked != null) {
       setState(() {
         _pickedLocation = picked;
-        _locationController.text = '${picked.latitude.toStringAsFixed(4)}, ${picked.longitude.toStringAsFixed(4)}';
+        _locationController.text =
+            '${picked.latitude.toStringAsFixed(4)}, ${picked.longitude.toStringAsFixed(4)}';
       });
     }
   }

@@ -1,0 +1,1 @@
+ /Users/shouryasonu/Development/inspectSync/inspectsync/lib/l10n/app_localizations_en.dart /Users/shouryasonu/Development/inspectSync/inspectsync/lib/l10n/app_localizations.dart:  /Users/shouryasonu/Development/inspectSync/inspectsync/l10n.yaml /Users/shouryasonu/Development/inspectSync/inspectsync/lib/l10n/app_en.arb

@@ -41,14 +41,13 @@ class MediaService {
       // 1. Get Presigned URL from Backend
       final response = await _apiClient.post(
         ApiEndpoints.presignedUrl,
-        data: {
-          'fileName': fileName,
-          'fileType': fileType,
-        },
+        data: {'fileName': fileName, 'fileType': fileType},
       );
 
       if (response.statusCode != 200) {
-        throw Exception('Failed to get presigned URL: ${response.data['message']}');
+        throw Exception(
+          'Failed to get presigned URL: ${response.data['message']}',
+        );
       }
 
       final String uploadUrl = response.data['data']['uploadUrl'];
@@ -72,7 +71,9 @@ class MediaService {
         AppLogger.info('Upload successful. Public URL: $publicUrl');
         return publicUrl;
       } else {
-        throw Exception('S3 upload failed with status ${uploadResponse.statusCode}');
+        throw Exception(
+          'S3 upload failed with status ${uploadResponse.statusCode}',
+        );
       }
     } catch (e) {
       AppLogger.error('Error uploading image: $e');

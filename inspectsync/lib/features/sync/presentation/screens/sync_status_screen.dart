@@ -93,7 +93,9 @@ class SyncStatusScreen extends StatelessWidget {
                   Icons.speed_rounded,
                   'UPLINK',
                   '${controller.speedMbps.toStringAsFixed(1)} Mbps',
-                  controller.speedMbps > 5 ? const Color(0xFF2E7D32) : const Color(0xFFF57C00),
+                  controller.speedMbps > 5
+                      ? const Color(0xFF2E7D32)
+                      : const Color(0xFFF57C00),
                 ),
               ),
               const SizedBox(width: 12),
@@ -103,7 +105,11 @@ class SyncStatusScreen extends StatelessWidget {
                   Icons.wifi_protected_setup_rounded,
                   'LATENCY',
                   '${controller.latencyMs} ms',
-                  controller.latencyMs < 150 ? const Color(0xFF2E7D32) : (controller.latencyMs < 400 ? const Color(0xFFF57C00) : const Color(0xFFC62828)),
+                  controller.latencyMs < 150
+                      ? const Color(0xFF2E7D32)
+                      : (controller.latencyMs < 400
+                            ? const Color(0xFFF57C00)
+                            : const Color(0xFFC62828)),
                 ),
               ),
             ],

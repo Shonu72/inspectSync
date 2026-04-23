@@ -16,10 +16,7 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
   Future<AuthResponseModel> login(String email, String password) async {
     final response = await apiClient.post(
       ApiEndpoints.login,
-      data: {
-        'email': email,
-        'password': password,
-      },
+      data: {'email': email, 'password': password},
     );
 
     if (response.statusCode == 200) {
@@ -34,11 +31,7 @@ class AuthRemoteDataSourceImpl implements IAuthRemoteDataSource {
   Future<UserModel> register(String email, String name, String password) async {
     final response = await apiClient.post(
       ApiEndpoints.register,
-      data: {
-        'email': email,
-        'name': name,
-        'password': password,
-      },
+      data: {'email': email, 'name': name, 'password': password},
     );
 
     if (response.statusCode == 201) {

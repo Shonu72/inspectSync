@@ -16,7 +16,7 @@ import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize dependency injection
   await di.init();
 
@@ -67,4 +67,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

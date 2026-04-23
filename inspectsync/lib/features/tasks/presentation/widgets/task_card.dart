@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:inspectsync/l10n/app_localizations.dart';
 
 enum TaskStatus { synced, failed, pending, inProgress }
+
 enum TaskPriority { low, medium, high }
 
 class TaskCard extends StatelessWidget {
@@ -63,143 +64,162 @@ class TaskCard extends StatelessWidget {
           color: colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(12),
         ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Status Indicator Line
-              Container(
-                width: 4,
-                color: statusColor,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                _getStatusIcon(status),
-                                size: 16,
-                                color: statusColor,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Status Indicator Line
+                Container(width: 4, color: statusColor),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  _getStatusIcon(status),
+                                  size: 16,
+                                  color: statusColor,
+                                ),
+                                const SizedBox(width: 8),
+                                _buildPriorityBadge(context),
+                              ],
+                            ),
+                            _buildStatusBadge(
+                              context,
+                              statusLabel,
+                              statusColor,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          title,
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
                               ),
-                              const SizedBox(width: 8),
-                              _buildPriorityBadge(context),
-                            ],
-                          ),
-                          _buildStatusBadge(context, statusLabel, statusColor),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        title,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        subtitle,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                      ),
-                      if (imageUrl != null) ...[
-                        const SizedBox(height: 16),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            imageUrl!,
-                            height: 120,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Container(
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitle,
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: colorScheme.onSurfaceVariant),
+                        ),
+                        if (imageUrl != null) ...[
+                          const SizedBox(height: 16),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              imageUrl!,
                               height: 120,
-                              color: colorScheme.surfaceContainer,
-                              child: const Icon(Icons.map_outlined),
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(
+                                    height: 120,
+                                    color: colorScheme.surfaceContainer,
+                                    child: const Icon(Icons.map_outlined),
+                                  ),
                             ),
                           ),
+                        ],
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            if (time != null) ...[
+                              Icon(
+                                Icons.access_time,
+                                size: 14,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                time!,
+                                style: Theme.of(context).textTheme.labelSmall,
+                              ),
+                            ],
+                            if (location != null) ...[
+                              Icon(
+                                Icons.location_on_outlined,
+                                size: 14,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                location!,
+                                style: Theme.of(context).textTheme.labelSmall,
+                              ),
+                            ],
+                            const Spacer(),
+                            if (status == TaskStatus.failed)
+                              ElevatedButton(
+                                onPressed: onActionPressed,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: colorScheme.primary,
+                                  foregroundColor: colorScheme.onPrimary,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  minimumSize: Size.zero,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.refresh, size: 14),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      l10n.retrySync,
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            else if (status == TaskStatus.inProgress)
+                              ElevatedButton(
+                                onPressed: onActionPressed,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: colorScheme.primary,
+                                  foregroundColor: colorScheme.onPrimary,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 8,
+                                  ),
+                                  minimumSize: Size.zero,
+                                ),
+                                child: Text(
+                                  l10n.continueTask,
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                              )
+                            else
+                              Icon(
+                                Icons.arrow_forward,
+                                size: 16,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                          ],
                         ),
                       ],
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          if (time != null) ...[
-                            Icon(Icons.access_time,
-                                size: 14, color: colorScheme.onSurfaceVariant),
-                            const SizedBox(width: 4),
-                            Text(
-                              time!,
-                              style: Theme.of(context).textTheme.labelSmall,
-                            ),
-                          ],
-                          if (location != null) ...[
-                            Icon(Icons.location_on_outlined,
-                                size: 14, color: colorScheme.onSurfaceVariant),
-                            const SizedBox(width: 4),
-                            Text(
-                              location!,
-                              style: Theme.of(context).textTheme.labelSmall,
-                            ),
-                          ],
-                          const Spacer(),
-                          if (status == TaskStatus.failed)
-                            ElevatedButton(
-                              onPressed: onActionPressed,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: colorScheme.primary,
-                                foregroundColor: colorScheme.onPrimary,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
-                                minimumSize: Size.zero,
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.refresh, size: 14),
-                                  const SizedBox(width: 4),
-                                  Text(l10n.retrySync,
-                                      style: const TextStyle(fontSize: 12)),
-                                ],
-                              ),
-                            )
-                          else if (status == TaskStatus.inProgress)
-                            ElevatedButton(
-                              onPressed: onActionPressed,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: colorScheme.primary,
-                                foregroundColor: colorScheme.onPrimary,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 8),
-                                minimumSize: Size.zero,
-                              ),
-                              child: Text(l10n.continueTask,
-                                  style: const TextStyle(fontSize: 12)),
-                            )
-                          else
-                            Icon(Icons.arrow_forward,
-                                size: 16, color: colorScheme.onSurfaceVariant),
-                        ],
-                      ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   IconData _getStatusIcon(TaskStatus status) {
     switch (status) {

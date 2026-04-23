@@ -21,23 +21,22 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> login(String email, String password) async {
     emit(AuthLoading());
-    
-    final result = await loginUseCase(LoginParams(email: email, password: password));
-    
-    result.fold(
-      (failure) => emit(AuthError(failure.message)),
-      (user) {
-        emit(AuthAuthenticated(user));
-        syncService.triggerImmediateSync();
-      },
+
+    final result = await loginUseCase(
+      LoginParams(email: email, password: password),
     );
+
+    result.fold((failure) => emit(AuthError(failure.message)), (user) {
+      emit(AuthAuthenticated(user));
+      syncService.triggerImmediateSync();
+    });
   }
 
   Future<void> logout() async {
     emit(AuthLoading());
-    
+
     final result = await logoutUseCase(NoParams());
-    
+
     result.fold(
       (failure) => emit(AuthError(failure.message)),
       (_) => emit(AuthUnauthenticated()),
@@ -46,17 +45,14 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> checkStatus() async {
     final result = await restoreSessionUseCase(NoParams());
-    
-    result.fold(
-      (failure) => emit(AuthUnauthenticated()),
-      (user) {
-        if (user != null) {
-          emit(AuthAuthenticated(user));
-          syncService.triggerImmediateSync();
-        } else {
-          emit(AuthUnauthenticated());
-        }
-      },
-    );
+
+    result.fold((failure) => emit(AuthUnauthenticated()), (user) {
+      if (user != null) {
+        emit(AuthAuthenticated(user));
+        syncService.triggerImmediateSync();
+      } else {
+        emit(AuthUnauthenticated());
+      }
+    });
   }
 }

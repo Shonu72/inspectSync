@@ -26,16 +26,16 @@ void main() {
   testWidgets('Offline architecture stub test', (WidgetTester tester) async {
     final db = AppDatabase();
     final localTaskDs = TaskLocalDataSource(db);
-    
+
     // Fixed: Pass required api client dependency for tests
     final remoteTaskDs = TaskRemoteDataSource(
       apiClient: ApiClient(
-        dio: Dio(), 
+        dio: Dio(),
         authInterceptor: AuthInterceptor(storage: const FlutterSecureStorage()),
         talker: Talker(),
       ),
     );
-    
+
     final queueManager = SyncQueueManager(db);
     final conflictResolver = ConflictResolver(db);
 
@@ -67,13 +67,29 @@ void main() {
     final router = GoRouter(
       routes: [
         GoRoute(path: '/', builder: (context, state) => const LoginScreen()),
-        GoRoute(path: '/dashboard', builder: (context, state) => MainScreen(syncController: syncController)),
-        GoRoute(path: '/sync', builder: (context, state) => SyncStatusScreen(controller: syncController)),
-        GoRoute(path: '/sync/conflict/:id', builder: (context, state) => ConflictResolutionScreen(conflict: state.extra as Conflict, db: db)),
+        GoRoute(
+          path: '/dashboard',
+          builder: (context, state) =>
+              MainScreen(syncController: syncController),
+        ),
+        GoRoute(
+          path: '/sync',
+          builder: (context, state) =>
+              SyncStatusScreen(controller: syncController),
+        ),
+        GoRoute(
+          path: '/sync/conflict/:id',
+          builder: (context, state) => ConflictResolutionScreen(
+            conflict: state.extra as Conflict,
+            db: db,
+          ),
+        ),
       ],
     );
 
-    await tester.pumpWidget(MyApp(router: router, taskRepository: taskRepository));
+    await tester.pumpWidget(
+      MyApp(router: router, taskRepository: taskRepository),
+    );
 
     expect(find.byType(LoginScreen), findsOneWidget);
   });

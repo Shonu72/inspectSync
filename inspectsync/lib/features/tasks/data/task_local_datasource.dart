@@ -9,19 +9,22 @@ class TaskLocalDataSource {
   TaskLocalDataSource(this._db);
 
   Stream<List<Task>> watchTasks() {
-    return (_db.select(_db.tasks)
-          ..orderBy(
-            [(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc)],
-          ))
+    return (_db.select(_db.tasks)..orderBy([
+          (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
+        ]))
         .watch();
   }
 
   Future<Task?> getTaskById(String id) {
-    return (_db.select(_db.tasks)..where((t) => t.id.equals(id))).getSingleOrNull();
+    return (_db.select(
+      _db.tasks,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
   }
 
   Stream<Task?> watchTaskById(String id) {
-    return (_db.select(_db.tasks)..where((t) => t.id.equals(id))).watchSingleOrNull();
+    return (_db.select(
+      _db.tasks,
+    )..where((t) => t.id.equals(id))).watchSingleOrNull();
   }
 
   Future<void> updateTaskLocally(Task task) async {
@@ -30,8 +33,9 @@ class TaskLocalDataSource {
       final updatedTask = task.copyWith(updatedAt: now, isSynced: false);
 
       // 1. Update local DB
-      await (_db.update(_db.tasks)..where((t) => t.id.equals(task.id)))
-          .write(updatedTask);
+      await (_db.update(
+        _db.tasks,
+      )..where((t) => t.id.equals(task.id))).write(updatedTask);
 
       // 2. Add to Sync Queue
       final payload = jsonEncode({
@@ -46,14 +50,18 @@ class TaskLocalDataSource {
         'images': updatedTask.images,
       });
 
-      await _db.into(_db.syncQueue).insert(SyncQueueCompanion.insert(
-            entityId: updatedTask.id,
-            entityType: 'task',
-            action: 'update',
-            payload: payload,
-            createdAt: now,
-            idempotencyKey: Value(const Uuid().v4()),
-          ));
+      await _db
+          .into(_db.syncQueue)
+          .insert(
+            SyncQueueCompanion.insert(
+              entityId: updatedTask.id,
+              entityType: 'task',
+              action: 'update',
+              payload: payload,
+              createdAt: now,
+              idempotencyKey: Value(const Uuid().v4()),
+            ),
+          );
     });
   }
 
@@ -74,24 +82,29 @@ class TaskLocalDataSource {
         'images': task.images,
       });
 
-      await _db.into(_db.syncQueue).insert(SyncQueueCompanion.insert(
-            entityId: task.id,
-            entityType: 'task',
-            action: 'create',
-            payload: payload,
-            createdAt: DateTime.now(),
-            idempotencyKey: Value(const Uuid().v4()),
-          ));
+      await _db
+          .into(_db.syncQueue)
+          .insert(
+            SyncQueueCompanion.insert(
+              entityId: task.id,
+              entityType: 'task',
+              action: 'create',
+              payload: payload,
+              createdAt: DateTime.now(),
+              idempotencyKey: Value(const Uuid().v4()),
+            ),
+          );
     });
   }
 
   // Update specific task state post-sync
   Future<void> markTaskSynced(String taskId, {int? newVersion}) async {
-    await (_db.update(_db.tasks)..where((t) => t.id.equals(taskId)))
-        .write(TasksCompanion(
-          isSynced: const Value(true),
-          version: newVersion != null ? Value(newVersion) : const Value.absent(),
-        ));
+    await (_db.update(_db.tasks)..where((t) => t.id.equals(taskId))).write(
+      TasksCompanion(
+        isSynced: const Value(true),
+        version: newVersion != null ? Value(newVersion) : const Value.absent(),
+      ),
+    );
   }
 
   /// Forcefully apply server data to local DB (used in Pull Sync)

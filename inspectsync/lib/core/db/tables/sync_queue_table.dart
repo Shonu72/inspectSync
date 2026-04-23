@@ -10,11 +10,11 @@ class SyncQueue extends Table {
 
   TextColumn get payload => text()(); // JSON string
 
-  TextColumn get status => text()
-      .withDefault(const Constant('pending'))(); // pending, syncing, failed
+  TextColumn get status => text().withDefault(
+    const Constant('pending'),
+  )(); // pending, syncing, failed
 
-  IntColumn get retryCount =>
-      integer().withDefault(const Constant(0))();
+  IntColumn get retryCount => integer().withDefault(const Constant(0))();
 
   DateTimeColumn get createdAt => dateTime()();
   TextColumn get idempotencyKey => text().nullable()();

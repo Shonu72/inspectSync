@@ -5,16 +5,16 @@ class AppTheme {
   // Tactical Architect Colors
   static const Color primary = Color(0xFF005BBF);
   static const Color primaryContainer = Color(0xFF1A73E8);
-  
+
   static const Color background = Color(0xFFF8FAFB); // surface
   static const Color surfaceContainer = Color(0xFFECEEEF);
   static const Color surfaceContainerLowest = Color(0xFFFFFFFF);
   static const Color surfaceDim = Color(0xFFD8DADB);
   static const Color surfaceBright = Color(0xFFF8FAFB);
-  
+
   static const Color onSurface = Color(0xFF191C1D);
   static const Color onSurfaceVariant = Color(0xFF414754);
-  
+
   static const Color tertiary = Color(0xFF006D2A); // Success
   static const Color error = Color(0xFFBA1A1A); // Conflict
   static const Color errorContainer = Color(0xFFFFDAD6);
@@ -82,7 +82,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: surfaceContainer, // "surface_container_high" equivalent
-        floatingLabelStyle: GoogleFonts.inter(color: primary, fontWeight: FontWeight.bold),
+        floatingLabelStyle: GoogleFonts.inter(
+          color: primary,
+          fontWeight: FontWeight.bold,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0),
           borderSide: BorderSide.none, // Explicitly no line
@@ -97,12 +100,15 @@ class AppTheme {
         ),
         errorStyle: const TextStyle(color: error),
       ),
-      
+
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primary, 
+          backgroundColor: primary,
           foregroundColor: Colors.white,
-          minimumSize: const Size(double.infinity, 48), // Large Touch Targets min 48dp
+          minimumSize: const Size(
+            double.infinity,
+            48,
+          ), // Large Touch Targets min 48dp
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0), // "radius lg (0.5rem)"
           ),
@@ -115,15 +121,19 @@ class AppTheme {
   // Tactical Architect - The Obsidian Command
   static ThemeData get darkTheme {
     const Color darkPrimary = Color(0xFF6B92ED); // Softened from #85ADFF
-    const Color darkPrimaryContainer = Color(0xFF5A84E6); // Softened from #6E9FFF
+    const Color darkPrimaryContainer = Color(
+      0xFF5A84E6,
+    ); // Softened from #6E9FFF
     const Color darkOnPrimary = Color(0xFF001B40); // Deepen text on button
-    
+
     const Color darkSurface = Color(0xFF060E20);
     const Color darkSurfaceContainerLow = Color(0xFF091328);
     const Color darkSurfaceContainer = Color(0xFF0F1930);
     const Color darkSurfaceContainerHighest = Color(0xFF192540);
-    const Color darkSurfaceContainerLowest = Color(0xFF0B1426); // Softened from #000000
-    
+    const Color darkSurfaceContainerLowest = Color(
+      0xFF0B1426,
+    ); // Softened from #000000
+
     const Color darkOnSurface = Color(0xFFC0CAE3); // Softened from #DEE5FF
     const Color darkOutlineVariant = Color(0xFF40485D);
 
@@ -141,7 +151,8 @@ class AppTheme {
         surfaceContainerLowest: darkSurfaceContainerLowest,
         error: error,
         onSurface: darkOnSurface,
-        onSurfaceVariant: darkOutlineVariant, // Using outline variant as secondary text tone
+        onSurfaceVariant:
+            darkOutlineVariant, // Using outline variant as secondary text tone
         outlineVariant: darkOutlineVariant,
         surfaceTint: darkPrimary,
       ),
@@ -152,7 +163,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: darkSurfaceContainerLow, // Default state input
-        floatingLabelStyle: GoogleFonts.inter(color: darkPrimary, fontWeight: FontWeight.bold),
+        floatingLabelStyle: GoogleFonts.inter(
+          color: darkPrimary,
+          fontWeight: FontWeight.bold,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0),
           borderSide: BorderSide.none, // Explicitly no line
@@ -171,7 +185,7 @@ class AppTheme {
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: darkPrimary, 
+          backgroundColor: darkPrimary,
           foregroundColor: darkOnPrimary,
           minimumSize: const Size(double.infinity, 48),
           shape: RoundedRectangleBorder(

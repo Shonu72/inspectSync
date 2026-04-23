@@ -56,7 +56,7 @@ class TaskRepository {
     );
 
     await local.insertTaskLocally(task);
-    
+
     // Trigger sync in background
     syncService.triggerImmediateSync();
   }
@@ -64,7 +64,7 @@ class TaskRepository {
   /// Update an existing task offline-first
   Future<void> updateTask(Task task) async {
     await local.updateTaskLocally(task);
-    
+
     // Trigger sync in background
     syncService.triggerImmediateSync();
   }

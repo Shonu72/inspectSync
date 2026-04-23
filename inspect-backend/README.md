@@ -148,3 +148,30 @@ npm start
 - **XAMPP Users**: XAMPP usually provides MySQL/MariaDB. This backend is configured for **PostgreSQL**. You will need to install PostgreSQL (via Homebrew or Postgres.app) to use it as-is, or modify the `provider` in `schema.prisma`.
 - **CORS**: Currently enabled for all origins (`*`) in development. Restrict this in `src/index.js` for production deployments.
 - **Versioning**: Ensure the mobile app increments local versions correctly to avoid persistent conflict loops.
+
+---
+
+## 🧠 Design Decisions
+
+### 1. PostgreSQL + Prisma
+We chose **PostgreSQL** for its strict relational integrity, essential for maintaining complex relationships between users, tasks, and sync logs. **Prisma** was selected as the ORM to provide type-safe database access, automated migrations, and a clean API that reduces boilerplate code.
+
+### 2. AWS S3 (Private-by-Default)
+Security is paramount for field operations. All inspection evidence is stored in private S3 buckets. The backend uses the **AWS S3 Request Presigner** to generate short-lived (24h) URLs, ensuring that media is only accessible to authorized personnel for a limited time.
+
+### 3. BullMQ + Redis
+Background tasks (image processing, notifications) are offloaded to **BullMQ**. This ensures the API remains responsive during high-volume sync operations, while maintaining a reliable queue for secondary tasks.
+
+---
+
+## 🛡️ Operational Resilience
+
+### Optimistic Concurrency Control
+The system uses a **versioning** strategy for every entity. When a client pushes an update, the backend compares the `clientVersion` with the `serverVersion`. If the server has a newer version, the system automatically performs a **Last-Write-Wins (LWW)** field-level merge and logs a conflict record for auditability.
+
+### Idempotent Sync Protocol
+To prevent duplicate data processing during network retries, every sync item includes a unique `idempotencyKey`. The backend caches these keys in **Redis** (fast check) and persists them in **PostgreSQL** (authoritative check) before processing any transaction.
+
+---
+
+Designed with ❤️ for Operational Excellence.

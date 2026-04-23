@@ -134,7 +134,9 @@ class _MapScreenState extends State<MapScreen>
           if (tasks.isNotEmpty && !_hasInitialBoundsFitted) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (mounted) {
-                final points = tasks.map((t) => LatLng(t.lat!, t.lng!)).toList();
+                final points = tasks
+                    .map((t) => LatLng(t.lat!, t.lng!))
+                    .toList();
                 final bounds = LatLngBounds.fromPoints(points);
                 _mapController.fitCamera(
                   CameraFit.bounds(
@@ -304,7 +306,8 @@ class _MapScreenState extends State<MapScreen>
                     _buildTacticalFab(
                       context,
                       icon: Icons.list_alt_rounded,
-                      onPressed: widget.onToggleList ?? () => context.go('/dashboard'),
+                      onPressed:
+                          widget.onToggleList ?? () => context.go('/dashboard'),
                       heroTag: 'map_list_fab',
                     ),
                     const SizedBox(height: 12),
@@ -312,7 +315,10 @@ class _MapScreenState extends State<MapScreen>
                       context,
                       icon: Icons.add_rounded,
                       onPressed: () {
-                        _mapController.move(_mapController.camera.center, _mapController.camera.zoom + 1);
+                        _mapController.move(
+                          _mapController.camera.center,
+                          _mapController.camera.zoom + 1,
+                        );
                       },
                       heroTag: 'map_zoom_in',
                     ),
@@ -321,7 +327,10 @@ class _MapScreenState extends State<MapScreen>
                       context,
                       icon: Icons.remove_rounded,
                       onPressed: () {
-                        _mapController.move(_mapController.camera.center, _mapController.camera.zoom - 1);
+                        _mapController.move(
+                          _mapController.camera.center,
+                          _mapController.camera.zoom - 1,
+                        );
                       },
                       heroTag: 'map_zoom_out',
                     ),
@@ -365,7 +374,10 @@ class _MapScreenState extends State<MapScreen>
           decoration: BoxDecoration(
             color: Colors.black.withValues(alpha: 0.8),
             borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: markerColor.withValues(alpha: 0.5), width: 1),
+            border: Border.all(
+              color: markerColor.withValues(alpha: 0.5),
+              width: 1,
+            ),
           ),
           child: Text(
             id,
@@ -389,10 +401,7 @@ class _MapScreenState extends State<MapScreen>
               blurRadius: 8,
             ),
             if (isSelected)
-              Shadow(
-                color: markerColor.withValues(alpha: 0.8),
-                blurRadius: 20,
-              ),
+              Shadow(color: markerColor.withValues(alpha: 0.8), blurRadius: 20),
           ],
         ),
       ],

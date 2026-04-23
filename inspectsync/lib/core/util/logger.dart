@@ -2,10 +2,7 @@ import 'package:talker/talker.dart';
 
 class AppLogger {
   static final Talker _talker = Talker(
-    settings: TalkerSettings(
-      useConsoleLogs: true,
-      useHistory: true,
-    ),
+    settings: TalkerSettings(useConsoleLogs: true, useHistory: true),
   );
 
   static Talker get talker => _talker;
@@ -30,7 +27,11 @@ class AppLogger {
     _talker.error(message, error, stackTrace);
   }
 
-  static void critical(String message, [dynamic error, StackTrace? stackTrace]) {
+  static void critical(
+    String message, [
+    dynamic error,
+    StackTrace? stackTrace,
+  ]) {
     _talker.critical(message, error, stackTrace);
   }
 

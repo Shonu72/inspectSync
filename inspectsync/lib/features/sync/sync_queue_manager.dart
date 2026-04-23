@@ -21,8 +21,9 @@ class SyncQueueManager {
   }
 
   Future<void> markQueueSyncing(int id) async {
-    await (_db.update(_db.syncQueue)..where((q) => q.id.equals(id)))
-        .write(const SyncQueueCompanion(status: drift.Value('syncing')));
+    await (_db.update(_db.syncQueue)..where((q) => q.id.equals(id))).write(
+      const SyncQueueCompanion(status: drift.Value('syncing')),
+    );
   }
 
   Future<void> markQueueCompleted(int id) async {
@@ -31,11 +32,12 @@ class SyncQueueManager {
 
   Future<bool> markQueueFailed(int id, int currentRetries) async {
     try {
-      await (_db.update(_db.syncQueue)..where((q) => q.id.equals(id)))
-          .write(SyncQueueCompanion(
-            status: const drift.Value('failed'),
-            retryCount: drift.Value(currentRetries + 1),
-          ));
+      await (_db.update(_db.syncQueue)..where((q) => q.id.equals(id))).write(
+        SyncQueueCompanion(
+          status: const drift.Value('failed'),
+          retryCount: drift.Value(currentRetries + 1),
+        ),
+      );
       return true;
     } catch (e) {
       return false;
@@ -43,9 +45,9 @@ class SyncQueueManager {
   }
 
   Future<bool> hasPending(String entityId) async {
-    final result = await (_db.select(_db.syncQueue)
-          ..where((q) => q.entityId.equals(entityId)))
-        .get();
+    final result = await (_db.select(
+      _db.syncQueue,
+    )..where((q) => q.entityId.equals(entityId))).get();
     return result.isNotEmpty;
   }
 }

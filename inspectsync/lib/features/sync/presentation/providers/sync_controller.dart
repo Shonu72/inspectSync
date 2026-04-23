@@ -70,8 +70,12 @@ class SyncController extends ChangeNotifier {
 
   void _onConnectivityChanged() {
     // When we come back online, auto-trigger a sync if there are pending items
-    if (connectivityService.isOnline && _pendingItems.isNotEmpty && !isSyncing) {
-      debugPrint('SyncController: Back online with ${_pendingItems.length} pending → auto-syncing');
+    if (connectivityService.isOnline &&
+        _pendingItems.isNotEmpty &&
+        !isSyncing) {
+      debugPrint(
+        'SyncController: Back online with ${_pendingItems.length} pending → auto-syncing',
+      );
       syncNow();
     }
     notifyListeners();
@@ -103,7 +107,7 @@ class SyncController extends ChangeNotifier {
     try {
       final dbFolder = await getApplicationDocumentsDirectory();
       final file = File(p.join(dbFolder.path, 'db.sqlite'));
-      
+
       if (await file.exists()) {
         final bytes = await file.length();
         if (bytes < 1024) {
@@ -113,7 +117,8 @@ class SyncController extends ChangeNotifier {
         } else if (bytes < 1024 * 1024 * 1024) {
           _storageSize = '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
         } else {
-          _storageSize = '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+          _storageSize =
+              '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
         }
         notifyListeners();
       }

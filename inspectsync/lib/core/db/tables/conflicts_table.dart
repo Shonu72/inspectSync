@@ -5,11 +5,10 @@ class Conflicts extends Table {
 
   TextColumn get entityId => text()();
 
-  TextColumn get localData => text()();   // JSON
-  TextColumn get serverData => text()();  // JSON
+  TextColumn get localData => text()(); // JSON
+  TextColumn get serverData => text()(); // JSON
 
-  TextColumn get status =>
-      text().withDefault(const Constant('unresolved'))();
+  TextColumn get status => text().withDefault(const Constant('unresolved'))();
 
   DateTimeColumn get createdAt => dateTime()();
 }

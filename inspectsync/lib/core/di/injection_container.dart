@@ -40,62 +40,76 @@ Future<void> init() async {
 
   sl.registerLazySingleton(() => ThemeCubit(sl()));
   sl.registerLazySingleton(() => SecurityCubit(sl()));
-  
+
   final dio = Dio();
   sl.registerLazySingleton(() => dio);
-  
+
   sl.registerLazySingleton(() => AuthInterceptor(storage: sl()));
-  sl.registerLazySingleton(() => ApiClient(dio: sl(), authInterceptor: sl(), talker: sl()));
-  
+  sl.registerLazySingleton(
+    () => ApiClient(dio: sl(), authInterceptor: sl(), talker: sl()),
+  );
+
   sl.registerLazySingleton(() => AppDatabase());
   sl.registerLazySingleton(() => ConnectivityService());
   sl.registerLazySingleton(() => MediaService(sl()));
 
   // Features - Auth
   // DataSources
-  sl.registerLazySingleton<IAuthRemoteDataSource>(() => AuthRemoteDataSourceImpl(apiClient: sl()));
-  
+  sl.registerLazySingleton<IAuthRemoteDataSource>(
+    () => AuthRemoteDataSourceImpl(apiClient: sl()),
+  );
+
   // Repositories
-  sl.registerLazySingleton<IAuthRepository>(() => AuthRepositoryImpl(remoteDataSource: sl(), storage: sl()));
-  
+  sl.registerLazySingleton<IAuthRepository>(
+    () => AuthRepositoryImpl(remoteDataSource: sl(), storage: sl()),
+  );
+
   // UseCases
   sl.registerLazySingleton(() => LoginUseCase(sl()));
   sl.registerLazySingleton(() => LogoutUseCase(sl()));
   sl.registerLazySingleton(() => RestoreSessionUseCase(sl()));
-  
+
   // Cubits
-  sl.registerFactory(() => AuthCubit(
-    loginUseCase: sl(), 
-    logoutUseCase: sl(),
-    restoreSessionUseCase: sl(),
-    syncService: sl(),
-  ));
-  
+  sl.registerFactory(
+    () => AuthCubit(
+      loginUseCase: sl(),
+      logoutUseCase: sl(),
+      restoreSessionUseCase: sl(),
+      syncService: sl(),
+    ),
+  );
+
   // Features - Sync & Tasks
   sl.registerLazySingleton(() => TaskLocalDataSource(sl()));
   sl.registerLazySingleton(() => TaskRemoteDataSource(apiClient: sl()));
   sl.registerLazySingleton(() => SyncQueueManager(sl()));
   sl.registerLazySingleton(() => ConflictResolver(sl()));
-  
-  sl.registerLazySingleton(() => SyncService(
-    queueManager: sl(),
-    remote: sl<TaskRemoteDataSource>(),
-    local: sl<TaskLocalDataSource>(),
-    conflictResolver: sl(),
-    connectivityService: sl(),
-    prefs: sl(),
-  ));
 
-  sl.registerLazySingleton(() => TaskRepository(
-    local: sl<TaskLocalDataSource>(),
-    remote: sl<TaskRemoteDataSource>(),
-    syncService: sl(),
-  ));
+  sl.registerLazySingleton(
+    () => SyncService(
+      queueManager: sl(),
+      remote: sl<TaskRemoteDataSource>(),
+      local: sl<TaskLocalDataSource>(),
+      conflictResolver: sl(),
+      connectivityService: sl(),
+      prefs: sl(),
+    ),
+  );
 
-  sl.registerLazySingleton(() => SyncController(
-    sl(),
-    sl(),
-    sl(),
-    connectivityService: sl<ConnectivityService>(),
-  ));
+  sl.registerLazySingleton(
+    () => TaskRepository(
+      local: sl<TaskLocalDataSource>(),
+      remote: sl<TaskRemoteDataSource>(),
+      syncService: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton(
+    () => SyncController(
+      sl(),
+      sl(),
+      sl(),
+      connectivityService: sl<ConnectivityService>(),
+    ),
+  );
 }

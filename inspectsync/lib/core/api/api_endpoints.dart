@@ -8,7 +8,7 @@ class ApiEndpoints {
 
   // Tasks
   static const String tasks = '/tasks';
-  
+
   // Sync
   static const String syncPush = '/sync/push';
   static const String syncPull = '/sync/pull';

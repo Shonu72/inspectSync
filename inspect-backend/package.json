@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
+    "test": "jest",
+    "lint": "eslint src/**",
     "db:push": "npx prisma db push",
     "db:seed": "node prisma/seed.js",
     "db:studio": "npx prisma studio",
@@ -37,8 +39,12 @@
     "rate-limit-redis": "^4.3.1"
   },
   "devDependencies": {
+    "eslint": "^10.2.1",
+    "eslint-plugin-jest": "^29.15.2",
+    "jest": "^30.3.0",
     "nodemon": "^3.1.14",
-    "prisma": "^7.6.0"
+    "prisma": "^7.6.0",
+    "supertest": "^7.2.2"
   },
   "type": "commonjs"
 }

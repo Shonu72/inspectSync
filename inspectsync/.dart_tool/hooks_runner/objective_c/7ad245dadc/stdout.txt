@@ -1,0 +1,63 @@
+Running `(cd /Users/shouryasonu/.pub-cache/hosted/pub.dev/objective_c-9.3.0/; TMPDIR=/var/folders/qm/m8ftzxp54lq2mlrwpyc2n5700000gn/T/ PATH=/Users/shouryasonu/.local/bin:/Users/shouryasonu/.antigravity/antigravity/bin:/Users/shouryasonu/.antigravity/antigravity/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:/opt/homebrew/opt/openjdk@21/bin:/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home/bin:/Users/shouryasonu/fvm/default/bin:/Library/Frameworks/Python.framework/Versions/3.13/bin:/opt/homebrew/opt/openjdk@17/bin:/opt/homebrew/opt/openjdk@17/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pkg/env/active/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/Users/shouryasonu/.pub-cache/bin HOME=/Users/shouryasonu /Users/shouryasonu/fvm/versions/3.41.6/bin/cache/dart-sdk/bin/dart --packages=/Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/package_config.json /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/objective_c/7ad245dadc/hook.dill --config=/Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/objective_c/7ad245dadc/input.json )`.
+INFO: 2026-04-23 15:56:23.700884: Running `/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang --version`.
+
+INFO: 2026-04-23 15:56:23.851482: Running `/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang --version`.
+
+INFO: 2026-04-23 15:56:23.865678: Running: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk -target arm64-apple-darwin -mmacos-version-min=13 -c /Users/shouryasonu/.pub-cache/hosted/pub.dev/objective_c-9.3.0/src/include/dart_api_dl.c -fpic -I src -o /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/include/dart_api_dl.c.o
+
+INFO: 2026-04-23 15:56:23.866013: Running: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk -target arm64-apple-darwin -mmacos-version-min=13 -c /Users/shouryasonu/.pub-cache/hosted/pub.dev/objective_c-9.3.0/src/objective_c.c -fpic -I src -o /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c.c.o
+
+INFO: 2026-04-23 15:56:23.866220: Running: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk -target arm64-apple-darwin -mmacos-version-min=13 -c /Users/shouryasonu/.pub-cache/hosted/pub.dev/objective_c-9.3.0/test/util.c -fpic -I src -o /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/test/util.c.o
+
+INFO: 2026-04-23 15:56:23.866336: Running: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk -target arm64-apple-darwin -mmacos-version-min=13 -x objective-c -fobjc-arc -c /Users/shouryasonu/.pub-cache/hosted/pub.dev/objective_c-9.3.0/src/input_stream_adapter.m -fpic -I src -o /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/input_stream_adapter.m.o
+
+INFO: 2026-04-23 15:56:23.866522: Running: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk -target arm64-apple-darwin -mmacos-version-min=13 -x objective-c -fobjc-arc -c /Users/shouryasonu/.pub-cache/hosted/pub.dev/objective_c-9.3.0/src/objective_c.m -fpic -I src -o /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c.m.o
+
+INFO: 2026-04-23 15:56:23.866738: Running: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk -target arm64-apple-darwin -mmacos-version-min=13 -x objective-c -fobjc-arc -c /Users/shouryasonu/.pub-cache/hosted/pub.dev/objective_c-9.3.0/src/ns_number.m -fpic -I src -o /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/ns_number.m.o
+
+INFO: 2026-04-23 15:56:23.866831: Running: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk -target arm64-apple-darwin -mmacos-version-min=13 -x objective-c -fobjc-arc -c /Users/shouryasonu/.pub-cache/hosted/pub.dev/objective_c-9.3.0/src/protocol.m -fpic -I src -o /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/protocol.m.o
+
+INFO: 2026-04-23 15:56:23.866946: Running: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk -target arm64-apple-darwin -mmacos-version-min=13 -x objective-c -fobjc-arc -c /Users/shouryasonu/.pub-cache/hosted/pub.dev/objective_c-9.3.0/src/objective_c_bindings_generated.m -fpic -I src -o /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c_bindings_generated.m.o
+
+INFO: 2026-04-23 15:56:23.977275: 
+INFO: 2026-04-23 15:56:23.977428: 
+INFO: 2026-04-23 15:56:23.977494: Generated /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c.c.o
+
+INFO: 2026-04-23 15:56:23.977797: 
+INFO: 2026-04-23 15:56:23.977836: 
+INFO: 2026-04-23 15:56:23.977860: Generated /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/include/dart_api_dl.c.o
+
+INFO: 2026-04-23 15:56:23.981979: 
+INFO: 2026-04-23 15:56:23.982018: 
+INFO: 2026-04-23 15:56:23.982044: Generated /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/test/util.c.o
+
+INFO: 2026-04-23 15:56:23.986803: 
+INFO: 2026-04-23 15:56:23.986838: 
+INFO: 2026-04-23 15:56:23.986850: Generated /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/observer.m.o
+
+INFO: 2026-04-23 15:56:23.993072: 
+INFO: 2026-04-23 15:56:23.993102: 
+INFO: 2026-04-23 15:56:23.993112: Generated /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/protocol.m.o
+
+INFO: 2026-04-23 15:56:24.237156: 
+INFO: 2026-04-23 15:56:24.237203: 
+INFO: 2026-04-23 15:56:24.237215: Generated /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/ns_number.m.o
+
+INFO: 2026-04-23 15:56:24.246966: 
+
+NFO: 2026-04-23 15:56:24.246750: 
+INFO: 2026-04-23 15:56:24.246762: Generated /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c.m.o
+
+INFO: 2026-04-23 15:56:24.247036: 
+INFO: 2026-04-23 15:56:24.247086: Generated /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/input_stream_adapter.m.o
+
+INFO: 2026-04-23 15:56:24.261989: 
+INFO: 2026-04-23 15:56:24.262015: 
+INFO: 2026-04-23 15:56:24.262026: Generated /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c_bindings_generated.m.o
+
+INFO: 2026-04-23 15:56:24.262402: Running: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -shared -Wl,-encryptable -undefined dynamic_lookup -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.4.sdk -target arm64-apple-darwin -mmacos-version-min=13 /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/include/dart_api_dl.c.o /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c.c.o /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/test/util.c.o /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/input_stream_adapter.m.o /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c.m.o /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/observer.m.o /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/ns_number.m.o /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/protocol.m.o /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c_bindings_generated.m.o -o /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/objective_c.dylib
+
+INFO: 2026-04-23 15:56:24.405337: 
+INFO: 2026-04-23 15:56:24.405392: 
+INFO: 2026-04-23 15:56:24.405404: Generated /Users/shouryasonu/Development/inspectSync/inspectsync/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/objective_c.dylib
+

@@ -15,13 +15,14 @@ class ConflictResolutionScreen extends StatefulWidget {
   });
 
   @override
-  State<ConflictResolutionScreen> createState() => _ConflictResolutionScreenState();
+  State<ConflictResolutionScreen> createState() =>
+      _ConflictResolutionScreenState();
 }
 
 class _ConflictResolutionScreenState extends State<ConflictResolutionScreen> {
   late Map<String, dynamic> localData;
   late Map<String, dynamic> serverData;
-  final Map<String, bool> selectedIsLocal = {}; 
+  final Map<String, bool> selectedIsLocal = {};
   final Set<String> conflictingKeys = {};
 
   @override
@@ -37,7 +38,7 @@ class _ConflictResolutionScreenState extends State<ConflictResolutionScreen> {
         final serverValue = serverData[key];
         if (localValue.toString() != serverValue.toString()) {
           conflictingKeys.add(key);
-          selectedIsLocal[key] = true; 
+          selectedIsLocal[key] = true;
         }
       }
     });
@@ -53,21 +54,26 @@ class _ConflictResolutionScreenState extends State<ConflictResolutionScreen> {
       }
     });
 
-    final int maxVersion = (localData['version'] as int? ?? 1) > (serverData['version'] as int? ?? 1)
+    final int maxVersion =
+        (localData['version'] as int? ?? 1) >
+            (serverData['version'] as int? ?? 1)
         ? (localData['version'] as int? ?? 1)
         : (serverData['version'] as int? ?? 1);
     final int nextVersion = maxVersion + 1;
 
     // 1. Update the actual task in local DB
-    await (widget.db.update(widget.db.tasks)..where((t) => t.id.equals(widget.conflict.entityId)))
-        .write(TasksCompanion(
-          title: drift.Value(resolvedData['title'] ?? ''),
-          description: drift.Value(resolvedData['description']),
-          status: drift.Value(resolvedData['status'] ?? 'pending'),
-          version: drift.Value(nextVersion),
-          isSynced: const drift.Value(false),
-          updatedAt: drift.Value(DateTime.now()),
-        ));
+    await (widget.db.update(
+      widget.db.tasks,
+    )..where((t) => t.id.equals(widget.conflict.entityId))).write(
+      TasksCompanion(
+        title: drift.Value(resolvedData['title'] ?? ''),
+        description: drift.Value(resolvedData['description']),
+        status: drift.Value(resolvedData['status'] ?? 'pending'),
+        version: drift.Value(nextVersion),
+        isSynced: const drift.Value(false),
+        updatedAt: drift.Value(DateTime.now()),
+      ),
+    );
 
     // 2. Add as a NEW operation in sync queue to broadcast the resolution
     final payload = jsonEncode({
@@ -76,19 +82,23 @@ class _ConflictResolutionScreenState extends State<ConflictResolutionScreen> {
       'updatedAt': DateTime.now().toIso8601String(),
     });
 
-    await widget.db.into(widget.db.syncQueue).insert(SyncQueueCompanion.insert(
-      entityId: widget.conflict.entityId,
-      entityType: 'task',
-      action: 'update',
-      payload: payload,
-      createdAt: DateTime.now(),
-    ));
+    await widget.db
+        .into(widget.db.syncQueue)
+        .insert(
+          SyncQueueCompanion.insert(
+            entityId: widget.conflict.entityId,
+            entityType: 'task',
+            action: 'update',
+            payload: payload,
+            createdAt: DateTime.now(),
+          ),
+        );
 
     // 3. Mark the conflict record as resolved
     await (widget.db.update(widget.db.conflicts)
           ..where((c) => c.id.equals(widget.conflict.id)))
         .write(const ConflictsCompanion(status: drift.Value('resolved')));
-    
+
     if (mounted) Navigator.pop(context, true);
   }
 
@@ -103,7 +113,10 @@ class _ConflictResolutionScreenState extends State<ConflictResolutionScreen> {
           icon: const Icon(Icons.arrow_back, color: AppTheme.primary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Conflict Resolution', style: TextStyle(fontSize: 18, color: Colors.black)),
+        title: const Text(
+          'Conflict Resolution',
+          style: TextStyle(fontSize: 18, color: Colors.black),
+        ),
       ),
       body: Column(
         children: [
@@ -145,7 +158,11 @@ class _ConflictResolutionScreenState extends State<ConflictResolutionScreen> {
               SizedBox(width: 4),
               Text(
                 'DATA CONFLICT DETECTED',
-                style: TextStyle(color: Colors.red, fontSize: 10, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -174,16 +191,35 @@ class _ConflictResolutionScreenState extends State<ConflictResolutionScreen> {
       children: [
         Expanded(
           child: ElevatedButton(
-            onPressed: () { setState(() { for (var key in conflictingKeys) { selectedIsLocal[key] = false; } }); },
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE0E0E0), foregroundColor: Colors.black, elevation: 0),
+            onPressed: () {
+              setState(() {
+                for (var key in conflictingKeys) {
+                  selectedIsLocal[key] = false;
+                }
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFE0E0E0),
+              foregroundColor: Colors.black,
+              elevation: 0,
+            ),
             child: const Text('Server All'),
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: ElevatedButton(
-            onPressed: () { setState(() { for (var key in conflictingKeys) { selectedIsLocal[key] = true; } }); },
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, elevation: 0),
+            onPressed: () {
+              setState(() {
+                for (var key in conflictingKeys) {
+                  selectedIsLocal[key] = true;
+                }
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primary,
+              elevation: 0,
+            ),
             child: const Text('Local All'),
           ),
         ),
@@ -195,37 +231,89 @@ class _ConflictResolutionScreenState extends State<ConflictResolutionScreen> {
     final isLocal = selectedIsLocal[key] ?? true;
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(key.toUpperCase(), style: TextStyle(color: Colors.grey[600], fontSize: 10, fontWeight: FontWeight.bold)),
+            Text(
+              key.toUpperCase(),
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 12),
-            _buildDataBlock(title: 'LOCAL', content: localData[key].toString(), isSelected: isLocal, onSelect: () => setState(() => selectedIsLocal[key] = true), isPrimary: true, fieldName: key),
+            _buildDataBlock(
+              title: 'LOCAL',
+              content: localData[key].toString(),
+              isSelected: isLocal,
+              onSelect: () => setState(() => selectedIsLocal[key] = true),
+              isPrimary: true,
+              fieldName: key,
+            ),
             const SizedBox(height: 12),
-            _buildDataBlock(title: 'SERVER', content: serverData[key].toString(), isSelected: !isLocal, onSelect: () => setState(() => selectedIsLocal[key] = false), isPrimary: false, fieldName: key),
+            _buildDataBlock(
+              title: 'SERVER',
+              content: serverData[key].toString(),
+              isSelected: !isLocal,
+              onSelect: () => setState(() => selectedIsLocal[key] = false),
+              isPrimary: false,
+              fieldName: key,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDataBlock({required String title, required String content, required bool isSelected, required VoidCallback onSelect, required bool isPrimary, required String fieldName}) {
+  Widget _buildDataBlock({
+    required String title,
+    required String content,
+    required bool isSelected,
+    required VoidCallback onSelect,
+    required bool isPrimary,
+    required String fieldName,
+  }) {
     return InkWell(
       onTap: onSelect,
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(border: Border.all(color: isSelected ? AppTheme.primary : const Color(0xFFEEEEEE)), borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isSelected ? AppTheme.primary : const Color(0xFFEEEEEE),
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
         child: Row(
           children: [
-            Icon(isSelected ? Icons.radio_button_checked : Icons.radio_button_off, size: 16, color: isSelected ? AppTheme.primary : Colors.grey),
+            Icon(
+              isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+              size: 16,
+              color: isSelected ? AppTheme.primary : Colors.grey,
+            ),
             const SizedBox(width: 12),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title, style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: isPrimary ? AppTheme.primary : Colors.grey)),
-              Text(content, style: const TextStyle(fontSize: 14)),
-            ])),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 8,
+                      fontWeight: FontWeight.bold,
+                      color: isPrimary ? AppTheme.primary : Colors.grey,
+                    ),
+                  ),
+                  Text(content, style: const TextStyle(fontSize: 14)),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -235,8 +323,15 @@ class _ConflictResolutionScreenState extends State<ConflictResolutionScreen> {
   Widget _buildFinalReview() {
     return ElevatedButton(
       onPressed: _resolve,
-      style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary, minimumSize: const Size(double.infinity, 56), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-      child: const Text('Commit & Resolve All', style: TextStyle(fontWeight: FontWeight.bold)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppTheme.primary,
+        minimumSize: const Size(double.infinity, 56),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      child: const Text(
+        'Commit & Resolve All',
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
     );
   }
 }

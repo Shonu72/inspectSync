@@ -20,7 +20,8 @@ class ConnectivityService extends ChangeNotifier {
   Timer? _periodicCheck;
 
   ConnectivityStatus _status = ConnectivityStatus.unknown;
-  ConnectivityStatus get status => _isManualOffline ? ConnectivityStatus.offline : _status;
+  ConnectivityStatus get status =>
+      _isManualOffline ? ConnectivityStatus.offline : _status;
 
   List<ConnectivityResult> _lastResults = [];
   int _lastLatencyMs = 0;
@@ -28,11 +29,13 @@ class ConnectivityService extends ChangeNotifier {
 
   int get latencyMs => _lastLatencyMs;
   double get speedMbps => _lastSpeedMbps;
-  
+
   String get networkType {
-    if (_lastResults.isEmpty || _lastResults.contains(ConnectivityResult.none)) return 'NONE';
+    if (_lastResults.isEmpty || _lastResults.contains(ConnectivityResult.none))
+      return 'NONE';
     if (_lastResults.contains(ConnectivityResult.wifi)) return 'WIFI';
-    if (_lastResults.contains(ConnectivityResult.mobile)) return 'LTE (4G)'; // Simplified for tactical display
+    if (_lastResults.contains(ConnectivityResult.mobile))
+      return 'LTE (4G)'; // Simplified for tactical display
     if (_lastResults.contains(ConnectivityResult.ethernet)) return 'ETH';
     if (_lastResults.contains(ConnectivityResult.vpn)) return 'VPN';
     return 'UNKNOWN';
@@ -41,8 +44,10 @@ class ConnectivityService extends ChangeNotifier {
   bool _isManualOffline = false;
   bool get isManualOffline => _isManualOffline;
 
-  bool get isOnline => !_isManualOffline && _status == ConnectivityStatus.online;
-  bool get isOffline => _isManualOffline || _status == ConnectivityStatus.offline;
+  bool get isOnline =>
+      !_isManualOffline && _status == ConnectivityStatus.online;
+  bool get isOffline =>
+      _isManualOffline || _status == ConnectivityStatus.offline;
 
   final _statusController = StreamController<ConnectivityStatus>.broadcast();
   Stream<ConnectivityStatus> get statusStream => _statusController.stream;
@@ -93,14 +98,15 @@ class ConnectivityService extends ChangeNotifier {
 
       // Second check: actual DNS lookup to verify internet reachability + measure latency
       final stopwatch = Stopwatch()..start();
-      final result = await InternetAddress.lookup('google.com')
-          .timeout(const Duration(seconds: 5));
+      final result = await InternetAddress.lookup(
+        'google.com',
+      ).timeout(const Duration(seconds: 5));
       stopwatch.stop();
 
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         _lastLatencyMs = stopwatch.elapsedMilliseconds;
         _lastResults = connectivityResults;
-        
+
         // Estimate "Uplink" speed based on latency (Simplified tactical estimation)
         // In a real scenario, this would be based on an actual data transfer.
         // For this operational dashboard, we use a quality-of-service (QoS) heuristic:
@@ -109,9 +115,9 @@ class ConnectivityService extends ChangeNotifier {
         } else if (_lastLatencyMs < 200) {
           _lastSpeedMbps = 12.4; // Good (4G/Strong WiFi)
         } else if (_lastLatencyMs < 500) {
-          _lastSpeedMbps = 2.8;  // Poor (3G/Congested)
+          _lastSpeedMbps = 2.8; // Poor (3G/Congested)
         } else {
-          _lastSpeedMbps = 0.5;  // Critically slow
+          _lastSpeedMbps = 0.5; // Critically slow
         }
 
         _updateStatus(ConnectivityStatus.online);
@@ -151,7 +157,9 @@ class ConnectivityService extends ChangeNotifier {
       if (value) {
         AppLogger.warning('ConnectivityService: MANUAL OFFLINE MODE ENGAGED');
       } else {
-        AppLogger.success('ConnectivityService: MANUAL OFFLINE MODE DISENGAGED');
+        AppLogger.success(
+          'ConnectivityService: MANUAL OFFLINE MODE DISENGAGED',
+        );
         checkNow(); // Re-verify actual connection when toggle is off
       }
     }
@@ -163,9 +171,13 @@ class ConnectivityService extends ChangeNotifier {
       _statusController.add(status); // Use logical status
       notifyListeners();
       if (newStatus == ConnectivityStatus.online) {
-        AppLogger.success('ConnectivityService: Network protocol established (ONLINE)');
+        AppLogger.success(
+          'ConnectivityService: Network protocol established (ONLINE)',
+        );
       } else {
-        AppLogger.warning('ConnectivityService: Network interface disconnected (OFFLINE)');
+        AppLogger.warning(
+          'ConnectivityService: Network interface disconnected (OFFLINE)',
+        );
       }
     }
   }
@@ -179,8 +191,4 @@ class ConnectivityService extends ChangeNotifier {
   }
 }
 
-enum ConnectivityStatus {
-  online,
-  offline,
-  unknown,
-}
+enum ConnectivityStatus { online, offline, unknown }

@@ -18,7 +18,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   late final DateTime _sessionStartedAt;
   late final Stream<DateTime> _timerStream;
   late final ValueNotifier<List<bool>> _checklistNotifier;
-  
+
   final List<String> _checklistItems = [
     "Verify casing integrity",
     "Measure input voltage levels",
@@ -30,7 +30,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   void initState() {
     super.initState();
     _sessionStartedAt = DateTime.now();
-    _timerStream = Stream.periodic(const Duration(seconds: 1), (_) => DateTime.now()).asBroadcastStream();
+    _timerStream = Stream.periodic(
+      const Duration(seconds: 1),
+      (_) => DateTime.now(),
+    ).asBroadcastStream();
     _checklistNotifier = ValueNotifier<List<bool>>([false, true, false, false]);
   }
 
@@ -61,7 +64,9 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           return Scaffold(
             backgroundColor: colorScheme.surface,
             appBar: AppBar(title: const Text("NOT FOUND")),
-            body: const Center(child: Text("Operational directive not found in local cache.")),
+            body: const Center(
+              child: Text("Operational directive not found in local cache."),
+            ),
           );
         }
 
@@ -77,11 +82,16 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             title: Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.green.withValues(alpha: 0.2)),
+                    border: Border.all(
+                      color: Colors.green.withValues(alpha: 0.2),
+                    ),
                   ),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
@@ -90,20 +100,32 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                       SizedBox(width: 4),
                       Text(
                         'ENCRYPTED SESSION',
-                        style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.green, letterSpacing: 1.0),
+                        style: TextStyle(
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                          letterSpacing: 1.0,
+                        ),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(l10n.taskDetails.toUpperCase(), 
-                  style: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                Text(
+                  l10n.taskDetails.toUpperCase(),
+                  style: textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
                 ),
               ],
             ),
             centerTitle: true,
             actions: [
-              IconButton(icon: const Icon(Icons.more_vert_rounded), onPressed: () {}),
+              IconButton(
+                icon: const Icon(Icons.more_vert_rounded),
+                onPressed: () {},
+              ),
             ],
           ),
           body: Stack(
@@ -115,7 +137,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                   children: [
                     // 1. Mission Header
                     _buildMissionHeader(context, task, l10n),
-                    
+
                     // 2. Technical Checklist
                     _buildSection(
                       context,
@@ -125,14 +147,20 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                         valueListenable: _checklistNotifier,
                         builder: (context, checklist, _) {
                           return Column(
-                            children: List.generate(_checklistItems.length, (index) {
-                              return _buildChecklistItem(context, index, checklist[index]);
+                            children: List.generate(_checklistItems.length, (
+                              index,
+                            ) {
+                              return _buildChecklistItem(
+                                context,
+                                index,
+                                checklist[index],
+                              );
                             }),
                           );
                         },
                       ),
                     ),
-                    
+
                     // 3. Field Evidence (Photos)
                     _buildSection(
                       context,
@@ -145,12 +173,13 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                             GridView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 12,
-                                childAspectRatio: 1,
-                              ),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 12,
+                                    mainAxisSpacing: 12,
+                                    childAspectRatio: 1,
+                                  ),
                               itemCount: task.images!.split(',').length,
                               itemBuilder: (context, index) {
                                 final imageUrl = task.images!.split(',')[index];
@@ -161,12 +190,19 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                                     fit: BoxFit.cover,
                                     placeholder: (context, url) => Container(
                                       color: colorScheme.surfaceContainer,
-                                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                                      child: const Center(
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
                                     ),
-                                    errorWidget: (context, url, error) => Container(
-                                      color: colorScheme.surfaceContainer,
-                                      child: const Icon(Icons.error_outline),
-                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        Container(
+                                          color: colorScheme.surfaceContainer,
+                                          child: const Icon(
+                                            Icons.error_outline,
+                                          ),
+                                        ),
                                   ),
                                 );
                               },
@@ -178,15 +214,31 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                               decoration: BoxDecoration(
                                 color: colorScheme.surfaceContainer,
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.1), style: BorderStyle.solid),
+                                border: Border.all(
+                                  color: colorScheme.outlineVariant.withValues(
+                                    alpha: 0.1,
+                                  ),
+                                  style: BorderStyle.solid,
+                                ),
                               ),
                               child: Column(
                                 children: [
-                                  Icon(Icons.photo_library_outlined, color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3), size: 32),
+                                  Icon(
+                                    Icons.photo_library_outlined,
+                                    color: colorScheme.onSurfaceVariant
+                                        .withValues(alpha: 0.3),
+                                    size: 32,
+                                  ),
                                   const SizedBox(height: 8),
                                   Text(
                                     'NO FIELD EVIDENCE COLLECTED',
-                                    style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5), letterSpacing: 1.0),
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w900,
+                                      color: colorScheme.onSurfaceVariant
+                                          .withValues(alpha: 0.5),
+                                      letterSpacing: 1.0,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -194,7 +246,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                         ],
                       ),
                     ),
-                    
+
                     // 4. Tactical Notes
                     _buildSection(
                       context,
@@ -210,9 +262,14 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                           maxLines: 4,
                           style: textTheme.bodyMedium,
                           decoration: InputDecoration(
-                            hintText: task.description ?? 'No site protocol found.',
+                            hintText:
+                                task.description ?? 'No site protocol found.',
                             border: InputBorder.none,
-                            hintStyle: TextStyle(color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
+                            hintStyle: TextStyle(
+                              color: colorScheme.onSurfaceVariant.withValues(
+                                alpha: 0.5,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -221,7 +278,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                   ],
                 ),
               ),
-              
+
               // Sticky Tactical Footer
               Positioned(
                 bottom: 0,
@@ -232,11 +289,15 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             ],
           ),
         );
-      }
+      },
     );
   }
 
-  Widget _buildMissionHeader(BuildContext context, Task task, AppLocalizations l10n) {
+  Widget _buildMissionHeader(
+    BuildContext context,
+    Task task,
+    AppLocalizations l10n,
+  ) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -245,7 +306,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLowest.withValues(alpha: 0.5),
-        border: Border(bottom: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.2))),
+        border: Border(
+          bottom: BorderSide(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.2),
+          ),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,7 +329,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
               const SizedBox(width: 8),
               Text(
                 '#OPS-${task.id.substring(0, 8).toUpperCase()}',
-                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -280,11 +348,21 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           const SizedBox(height: 12),
           Row(
             children: [
-              Icon(Icons.location_on, size: 14, color: colorScheme.onSurfaceVariant),
+              Icon(
+                Icons.location_on,
+                size: 14,
+                color: colorScheme.onSurfaceVariant,
+              ),
               const SizedBox(width: 4),
               Text(
-                task.lat != null ? "COORDINATES: ${task.lat}, ${task.lng}" : "LOCATION DATA UNKNOWN",
-                style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 10, fontWeight: FontWeight.bold),
+                task.lat != null
+                    ? "COORDINATES: ${task.lat}, ${task.lng}"
+                    : "LOCATION DATA UNKNOWN",
+                style: TextStyle(
+                  color: colorScheme.onSurfaceVariant,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -293,7 +371,12 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
   }
 
-  Widget _buildSection(BuildContext context, {required String title, required IconData icon, required Widget child}) {
+  Widget _buildSection(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required Widget child,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 32, 24, 0),
@@ -306,7 +389,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
               const SizedBox(width: 8),
               Text(
                 title,
-                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 1.2),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 11,
+                  letterSpacing: 1.2,
+                ),
               ),
             ],
           ),
@@ -319,7 +406,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
 
   Widget _buildChecklistItem(BuildContext context, int index, bool isDone) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return GestureDetector(
       onTap: () {
         final current = List<bool>.from(_checklistNotifier.value);
@@ -330,10 +417,14 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDone ? colorScheme.primary.withValues(alpha: 0.05) : colorScheme.surfaceContainer,
+          color: isDone
+              ? colorScheme.primary.withValues(alpha: 0.05)
+              : colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isDone ? colorScheme.primary.withValues(alpha: 0.3) : Colors.transparent,
+            color: isDone
+                ? colorScheme.primary.withValues(alpha: 0.3)
+                : Colors.transparent,
           ),
         ),
         child: Row(
@@ -342,14 +433,18 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
               child: Text(
                 _checklistItems[index],
                 style: TextStyle(
-                  fontSize: 14, 
+                  fontSize: 14,
                   fontWeight: isDone ? FontWeight.bold : FontWeight.w500,
-                  color: isDone ? colorScheme.onSurface : colorScheme.onSurfaceVariant,
+                  color: isDone
+                      ? colorScheme.onSurface
+                      : colorScheme.onSurfaceVariant,
                 ),
               ),
             ),
             Icon(
-              isDone ? Icons.check_circle_rounded : Icons.radio_button_off_rounded,
+              isDone
+                  ? Icons.check_circle_rounded
+                  : Icons.radio_button_off_rounded,
               color: isDone ? colorScheme.primary : colorScheme.outline,
               size: 20,
             ),
@@ -359,14 +454,22 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
   }
 
-  Widget _buildTacticalFooter(BuildContext context, AppLocalizations l10n, Task task) {
+  Widget _buildTacticalFooter(
+    BuildContext context,
+    AppLocalizations l10n,
+    Task task,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        border: Border(top: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.2))),
+        border: Border(
+          top: BorderSide(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.2),
+          ),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.2),
@@ -387,11 +490,20 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                     final now = snapshot.data ?? DateTime.now();
                     final duration = now.difference(_sessionStartedAt);
                     final hours = duration.inHours.toString().padLeft(2, '0');
-                    final minutes = (duration.inMinutes % 60).toString().padLeft(2, '0');
-                    final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+                    final minutes = (duration.inMinutes % 60)
+                        .toString()
+                        .padLeft(2, '0');
+                    final seconds = (duration.inSeconds % 60)
+                        .toString()
+                        .padLeft(2, '0');
                     final elapsedStr = "$hours:$minutes:$seconds";
-                    
-                    return _buildMetricTile('TIME ON SITE', elapsedStr, Icons.timer_outlined, colorScheme.primary);
+
+                    return _buildMetricTile(
+                      'TIME ON SITE',
+                      elapsedStr,
+                      Icons.timer_outlined,
+                      colorScheme.primary,
+                    );
                   },
                 ),
               ),
@@ -401,8 +513,14 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                   valueListenable: _checklistNotifier,
                   builder: (context, checklist, _) {
                     final completedCount = checklist.where((v) => v).length;
-                    final percent = (completedCount / _checklistItems.length * 100).toInt();
-                    return _buildMetricTile('PROGRESS', '$percent%', Icons.analytics_outlined, Colors.orange);
+                    final percent =
+                        (completedCount / _checklistItems.length * 100).toInt();
+                    return _buildMetricTile(
+                      'PROGRESS',
+                      '$percent%',
+                      Icons.analytics_outlined,
+                      Colors.orange,
+                    );
                   },
                 ),
               ),
@@ -417,10 +535,18 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: colorScheme.primary,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 elevation: 0,
               ),
-              child: const Text('SUBMIT REPORT TO COMMAND', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+              child: const Text(
+                'SUBMIT REPORT TO COMMAND',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
             ),
           ),
         ],
@@ -428,7 +554,12 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
   }
 
-  Widget _buildMetricTile(String label, String value, IconData icon, Color accent) {
+  Widget _buildMetricTile(
+    String label,
+    String value,
+    IconData icon,
+    Color accent,
+  ) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -443,11 +574,22 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             children: [
               Icon(icon, size: 10, color: accent),
               const SizedBox(width: 4),
-              Text(label, style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: accent, letterSpacing: 1.0)),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 8,
+                  fontWeight: FontWeight.w900,
+                  color: accent,
+                  letterSpacing: 1.0,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 4),
-          Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+          ),
         ],
       ),
     );

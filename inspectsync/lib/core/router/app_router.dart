@@ -15,7 +15,8 @@ import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../db/app_database.dart';
 
 class AppRouter {
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
 
   static const String login = '/';
   static const String dashboard = '/dashboard';
@@ -25,7 +26,11 @@ class AppRouter {
   static const String createTask = '/create-task';
   static const String conflictResolution = '/sync/conflict/:id';
 
-  static GoRouter createRouter(AuthCubit authCubit, SyncController syncController, AppDatabase db) {
+  static GoRouter createRouter(
+    AuthCubit authCubit,
+    SyncController syncController,
+    AppDatabase db,
+  ) {
     return GoRouter(
       navigatorKey: navigatorKey,
       initialLocation: login,
@@ -41,13 +46,11 @@ class AppRouter {
         return null;
       },
       routes: [
-        GoRoute(
-          path: login,
-          builder: (context, state) => const LoginScreen(),
-        ),
+        GoRoute(path: login, builder: (context, state) => const LoginScreen()),
         GoRoute(
           path: dashboard,
-          builder: (context, state) => MainScreen(syncController: syncController),
+          builder: (context, state) =>
+              MainScreen(syncController: syncController),
         ),
         GoRoute(
           path: profile,
@@ -55,7 +58,8 @@ class AppRouter {
         ),
         GoRoute(
           path: sync,
-          builder: (context, state) => SyncStatusScreen(controller: syncController),
+          builder: (context, state) =>
+              SyncStatusScreen(controller: syncController),
         ),
         GoRoute(
           path: conflictResolution,
@@ -84,8 +88,8 @@ class GoRouterRefreshStream extends ChangeNotifier {
   GoRouterRefreshStream(Stream<dynamic> stream) {
     notifyListeners();
     _subscription = stream.asBroadcastStream().listen(
-          (dynamic _) => notifyListeners(),
-        );
+      (dynamic _) => notifyListeners(),
+    );
   }
 
   late final StreamSubscription<dynamic> _subscription;

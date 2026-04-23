@@ -34,7 +34,9 @@ class ProfileScreen extends StatelessWidget {
             ),
             title: Text(
               'Engineer Profile',
-              style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             actions: [
               IconButton(
@@ -73,7 +75,9 @@ class ProfileScreen extends StatelessWidget {
                               color: colorScheme.primaryContainer,
                               borderRadius: BorderRadius.circular(20),
                               image: const DecorationImage(
-                                image: NetworkImage('https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=200&h=200'),
+                                image: NetworkImage(
+                                  'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=200&h=200',
+                                ),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -86,9 +90,16 @@ class ProfileScreen extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: colorScheme.primary,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 2),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                ),
                               ),
-                              child: const Icon(Icons.verified, color: Colors.white, size: 16),
+                              child: const Icon(
+                                Icons.verified,
+                                color: Colors.white,
+                                size: 16,
+                              ),
                             ),
                           ),
                         ],
@@ -96,15 +107,22 @@ class ProfileScreen extends StatelessWidget {
                       const SizedBox(height: 16),
                       Text(
                         name,
-                        style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                        style: textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       Text(
                         role,
-                        style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
                       const SizedBox(height: 16),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: colorScheme.surfaceContainer,
                           borderRadius: BorderRadius.circular(30),
@@ -112,7 +130,11 @@ class ProfileScreen extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.calendar_today, size: 14, color: colorScheme.onSurfaceVariant),
+                            Icon(
+                              Icons.calendar_today,
+                              size: 14,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
                             const SizedBox(width: 8),
                             const Text(
                               'MEMBER SINCE JAN 2022',
@@ -140,7 +162,8 @@ class ProfileScreen extends StatelessWidget {
                       subtitle: 'Switch between Light and Dark',
                       trailing: Switch(
                         value: themeMode == ThemeMode.dark,
-                        onChanged: (v) => context.read<ThemeCubit>().toggleTheme(v),
+                        onChanged: (v) =>
+                            context.read<ThemeCubit>().toggleTheme(v),
                       ),
                     );
                   },
@@ -183,13 +206,15 @@ class ProfileScreen extends StatelessWidget {
                       context,
                       icon: Icons.fingerprint,
                       title: 'Biometric Login',
-                      subtitle: state.isBiometricSupported 
+                      subtitle: state.isBiometricSupported
                           ? 'FaceID or Fingerprint access'
                           : 'Biometrics not supported on this device',
                       trailing: Switch(
                         value: state.isBiometricEnabled,
-                        onChanged: state.isBiometricSupported 
-                            ? (v) => context.read<SecurityCubit>().toggleBiometrics(v)
+                        onChanged: state.isBiometricSupported
+                            ? (v) => context
+                                  .read<SecurityCubit>()
+                                  .toggleBiometrics(v)
                             : null,
                       ),
                     );
@@ -208,7 +233,8 @@ class ProfileScreen extends StatelessWidget {
                   onTap: () => _showConfirmationDialog(
                     context,
                     title: 'Logout',
-                    message: 'Are you sure you want to log out of your session?',
+                    message:
+                        'Are you sure you want to log out of your session?',
                     confirmLabel: 'LOGOUT',
                     isDestructive: false,
                     onConfirm: () => context.read<AuthCubit>().logout(),
@@ -224,7 +250,8 @@ class ProfileScreen extends StatelessWidget {
                   onTap: () => _showConfirmationDialog(
                     context,
                     title: 'Delete Account',
-                    message: 'This action is permanent and cannot be undone. All your local data will be lost.',
+                    message:
+                        'This action is permanent and cannot be undone. All your local data will be lost.',
                     confirmLabel: 'DELETE',
                     isDestructive: true,
                     onConfirm: () {
@@ -256,10 +283,7 @@ class ProfileScreen extends StatelessWidget {
       builder: (context) => AlertDialog(
         backgroundColor: colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         content: Text(
           message,
           style: TextStyle(color: colorScheme.onSurfaceVariant),
@@ -269,7 +293,10 @@ class ProfileScreen extends StatelessWidget {
             onPressed: () => Navigator.pop(context),
             child: Text(
               'CANCEL',
-              style: TextStyle(color: colorScheme.onSurfaceVariant, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           ElevatedButton(
@@ -278,10 +305,16 @@ class ProfileScreen extends StatelessWidget {
               onConfirm();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: isDestructive ? colorScheme.error : colorScheme.primary,
-              foregroundColor: isDestructive ? colorScheme.onError : colorScheme.onPrimary,
+              backgroundColor: isDestructive
+                  ? colorScheme.error
+                  : colorScheme.primary,
+              foregroundColor: isDestructive
+                  ? colorScheme.onError
+                  : colorScheme.onPrimary,
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             child: Text(
               confirmLabel,
@@ -327,7 +360,9 @@ class ProfileScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.1)),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.1),
+        ),
       ),
       child: ListTile(
         onTap: onTap,
@@ -338,7 +373,11 @@ class ProfileScreen extends StatelessWidget {
             color: (iconColor ?? colorScheme.primary).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: iconColor ?? colorScheme.onSurfaceVariant, size: 20),
+          child: Icon(
+            icon,
+            color: iconColor ?? colorScheme.onSurfaceVariant,
+            size: 20,
+          ),
         ),
         title: Text(
           title,
@@ -349,9 +388,9 @@ class ProfileScreen extends StatelessWidget {
         ),
         subtitle: Text(
           subtitle,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: colorScheme.onSurfaceVariant),
         ),
         trailing: trailing,
       ),

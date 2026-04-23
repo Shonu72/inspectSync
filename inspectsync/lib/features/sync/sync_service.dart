@@ -41,7 +41,7 @@ class SyncService {
 
   final SharedPreferences _prefs;
   static const String _lastSyncKey = 'last_successful_sync';
-  
+
   DateTime? _lastSuccessfulSync;
   DateTime? get lastSuccessfulSync => _lastSuccessfulSync;
 
@@ -67,18 +67,25 @@ class SyncService {
     }
   }
 
-  /// Triggered whenever a user makes a change or background worker wakes up
-  void triggerImmediateSync() {
+  /// Initiates a synchronization routine.
+  ///
+  /// This will first push local changes from the [SyncQueueManager] to the [TaskRemoteDataSource].
+  /// If conflicts are detected, they are handed off to the [ConflictResolver].
+  /// After the push phase, it pulls delta updates from the server and updates [TaskLocalDataSource].
+  Future<void> triggerImmediateSync() async {
     if (_isSyncing) return;
-    _runSyncRoutine();
+    await _runSyncRoutine();
   }
 
+  /// Internal synchronization routine that handles both Push and Pull phases.
   Future<void> _runSyncRoutine() async {
     if (_isSyncing) return;
-    
-    // Check connectivity before starting
+
+    // Safety check for network availability before starting protocol
     if (connectivityService.isOffline) {
-      debugPrint('SyncService: Skipping sync routine — device is offline');
+      debugPrint(
+        'SyncService: Aborting sync routine — device protocol is OFFLINE',
+      );
       return;
     }
 
@@ -90,17 +97,21 @@ class SyncService {
       final pushTotal = queueItems.length;
 
       if (pushTotal > 0) {
-        _progressController.add(SyncProgress(
-          totalItems: pushTotal,
-          completedItems: 0,
-          currentItemDescription: 'Uploading local changes...',
-          isSyncing: true,
-        ));
+        _progressController.add(
+          SyncProgress(
+            totalItems: pushTotal,
+            completedItems: 0,
+            currentItemDescription: 'Uploading local changes...',
+            isSyncing: true,
+          ),
+        );
 
         final List<Map<String, dynamic>> changes = [];
         for (final item in queueItems) {
-          final payloadMap = Map<String, dynamic>.from(jsonDecode(item.payload));
-          
+          final payloadMap = Map<String, dynamic>.from(
+            jsonDecode(item.payload),
+          );
+
           // Map internal priority int to backend enum strings
           if (payloadMap.containsKey('priority')) {
             final pInt = payloadMap['priority'] as int;
@@ -113,7 +124,9 @@ class SyncService {
             'entityType': item.entityType,
             'operation': item.action,
             'payload': payloadMap,
-            'idempotencyKey': item.idempotencyKey ?? 'backup-${item.id}-${item.createdAt.millisecondsSinceEpoch}',
+            'idempotencyKey':
+                item.idempotencyKey ??
+                'backup-${item.id}-${item.createdAt.millisecondsSinceEpoch}',
             'clientVersion': payloadMap['version'] ?? 1,
           });
         }
@@ -131,7 +144,9 @@ class SyncService {
         final List<dynamic> syncedResults = result['synced'] ?? [];
         for (final success in syncedResults) {
           final entityId = success['entityId'];
-          final queueItem = queueItems.firstWhere((i) => i.entityId == entityId);
+          final queueItem = queueItems.firstWhere(
+            (i) => i.entityId == entityId,
+          );
           await queueManager.markQueueCompleted(queueItem.id);
           await local.markTaskSynced(entityId, newVersion: success['version']);
         }
@@ -144,48 +159,64 @@ class SyncService {
             conflict['clientData'],
             conflict['serverData'],
           );
-          final queueItem = queueItems.firstWhere((i) => i.entityId == conflict['entityId']);
-          await queueManager.markQueueFailed(queueItem.id, queueItem.retryCount);
+          final queueItem = queueItems.firstWhere(
+            (i) => i.entityId == conflict['entityId'],
+          );
+          await queueManager.markQueueFailed(
+            queueItem.id,
+            queueItem.retryCount,
+          );
         }
 
         // Process Push Failures
         final List<dynamic> failedResults = result['failed'] ?? [];
         for (final failure in failedResults) {
-          final queueItem = queueItems.firstWhere((i) => i.entityId == failure['entityId']);
-          await queueManager.markQueueFailed(queueItem.id, queueItem.retryCount);
+          final queueItem = queueItems.firstWhere(
+            (i) => i.entityId == failure['entityId'],
+          );
+          await queueManager.markQueueFailed(
+            queueItem.id,
+            queueItem.retryCount,
+          );
         }
       }
 
       // Re-verify connectivity before Pull phase
       if (connectivityService.isOffline) {
         debugPrint('SyncService: Skipping pull phase — device went offline');
-        _progressController.add(SyncProgress(
-          totalItems: 1,
-          completedItems: 1,
-          currentItemDescription: 'Push completed, Pull skipped (Offline)',
-          isSyncing: false,
-        ));
+        _progressController.add(
+          SyncProgress(
+            totalItems: 1,
+            completedItems: 1,
+            currentItemDescription: 'Push completed, Pull skipped (Offline)',
+            isSyncing: false,
+          ),
+        );
         return;
       }
 
       // --- PHASE 2: PULL CHANGES ---
-      _progressController.add(SyncProgress(
-        totalItems: 1,
-        completedItems: 0,
-        currentItemDescription: 'Checking for remote updates...',
-        isSyncing: true,
-      ));
+      _progressController.add(
+        SyncProgress(
+          totalItems: 1,
+          completedItems: 0,
+          currentItemDescription: 'Checking for remote updates...',
+          isSyncing: true,
+        ),
+      );
 
       final pullResult = await remote.pullBatch(_lastSyncedAt);
-      
+
       // Update/Insert Remote Tasks
       final List<dynamic> remoteTasks = pullResult['tasks'] ?? [];
       for (final rawTask in remoteTasks) {
         final String taskId = rawTask['id'];
-        
+
         // Safety: Don't overwrite if we have pending local changes for this task
         if (await queueManager.hasPending(taskId)) {
-          debugPrint('SyncService: Skipping pull-update for $taskId - local changes pending');
+          debugPrint(
+            'SyncService: Skipping pull-update for $taskId - local changes pending',
+          );
           continue;
         }
 
@@ -216,7 +247,9 @@ class SyncService {
       for (final id in deletedIds) {
         final String taskId = id.toString();
         if (await queueManager.hasPending(taskId)) {
-          debugPrint('SyncService: Skipping pull-delete for $taskId - local changes pending');
+          debugPrint(
+            'SyncService: Skipping pull-delete for $taskId - local changes pending',
+          );
           continue;
         }
         await local.deleteTaskLocally(taskId);
@@ -225,22 +258,29 @@ class SyncService {
       // 3. Finalize
       _lastSyncedAt = pullResult['serverTime'];
       _lastSuccessfulSync = DateTime.now();
-      await _prefs.setString(_lastSyncKey, _lastSuccessfulSync!.toIso8601String());
-      
-      _progressController.add(SyncProgress(
-        totalItems: 1,
-        completedItems: 1,
-        currentItemDescription: 'Synchronization successful',
-        isSyncing: false,
-      ));
+      await _prefs.setString(
+        _lastSyncKey,
+        _lastSuccessfulSync!.toIso8601String(),
+      );
+
+      _progressController.add(
+        SyncProgress(
+          totalItems: 1,
+          completedItems: 1,
+          currentItemDescription: 'Synchronization successful',
+          isSyncing: false,
+        ),
+      );
     } catch (e) {
       debugPrint('Sync Routine Failed: $e');
-      _progressController.add(SyncProgress(
-        totalItems: 0,
-        completedItems: 0,
-        currentItemDescription: 'Sync error: $e',
-        isSyncing: false,
-      ));
+      _progressController.add(
+        SyncProgress(
+          totalItems: 0,
+          completedItems: 0,
+          currentItemDescription: 'Sync error: $e',
+          isSyncing: false,
+        ),
+      );
     } finally {
       _isSyncing = false;
     }

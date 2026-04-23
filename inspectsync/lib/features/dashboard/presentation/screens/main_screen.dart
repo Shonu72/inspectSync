@@ -41,10 +41,7 @@ class _MainScreenState extends State<MainScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _screens,
-      ),
+      body: IndexedStack(index: _selectedIndex, children: _screens),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 8.0,
@@ -55,7 +52,7 @@ class _MainScreenState extends State<MainScreen> {
             _buildNavItem(1, Icons.map_rounded, l10n.bottomNavMap),
             const SizedBox(width: 48), // Space for FAB
             _buildNavItem(2, Icons.assignment_rounded, l10n.bottomNavTasks),
-            _buildNavItem(3, Icons.sync_rounded, "SYNC", isRedirect: true), 
+            _buildNavItem(3, Icons.sync_rounded, "SYNC", isRedirect: true),
           ],
         ),
       ),
@@ -69,7 +66,12 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  Widget _buildNavItem(int index, IconData icon, String label, {bool isRedirect = false}) {
+  Widget _buildNavItem(
+    int index,
+    IconData icon,
+    String label, {
+    bool isRedirect = false,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
     final isSelected = _selectedIndex == index && !isRedirect;
 
@@ -86,7 +88,9 @@ class _MainScreenState extends State<MainScreen> {
         children: [
           Icon(
             icon,
-            color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+            color: isSelected
+                ? colorScheme.primary
+                : colorScheme.onSurfaceVariant,
             size: 24,
           ),
           Text(
@@ -94,7 +98,9 @@ class _MainScreenState extends State<MainScreen> {
             style: TextStyle(
               fontSize: 10,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+              color: isSelected
+                  ? colorScheme.primary
+                  : colorScheme.onSurfaceVariant,
             ),
           ),
         ],

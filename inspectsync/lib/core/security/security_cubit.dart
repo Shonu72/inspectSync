@@ -28,21 +28,24 @@ class SecurityCubit extends Cubit<SecurityState> {
   static const String _biometricKey = 'biometric_enabled';
 
   SecurityCubit(this._prefs)
-      : super(SecurityState(
+    : super(
+        SecurityState(
           isBiometricEnabled: _prefs.getBool(_biometricKey) ?? false,
           isBiometricSupported: false,
-        )) {
+        ),
+      ) {
     _checkSupport();
   }
 
   Future<void> _checkSupport() async {
-    final isSupported = await _auth.canCheckBiometrics || await _auth.isDeviceSupported();
+    final isSupported =
+        await _auth.canCheckBiometrics || await _auth.isDeviceSupported();
     emit(state.copyWith(isBiometricSupported: isSupported));
   }
 
   Future<void> toggleBiometrics(bool enabled) async {
     if (enabled && !state.isBiometricSupported) return;
-    
+
     await _prefs.setBool(_biometricKey, enabled);
     emit(state.copyWith(isBiometricEnabled: enabled));
   }

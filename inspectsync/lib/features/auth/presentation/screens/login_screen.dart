@@ -70,10 +70,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 24),
                       Text(
                         'InspectSync',
-                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: -0.5,
-                        ),
+                        style: Theme.of(context).textTheme.headlineLarge
+                            ?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.5,
+                            ),
                       ),
                       Text(
                         'SECURE FIELD TERMINAL',
@@ -84,14 +85,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 48),
-                      
+
                       // Card-like Form
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
                           color: colorScheme.surfaceContainerLowest,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                          border: Border.all(
+                            color: colorScheme.outlineVariant.withValues(
+                              alpha: 0.5,
+                            ),
+                          ),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.05),
@@ -114,10 +119,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               children: [
                                 Text(
                                   'IDENTIFICATION',
-                                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: Theme.of(context).textTheme.labelSmall
+                                      ?.copyWith(
+                                        color: colorScheme.onSurfaceVariant,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                 ),
                                 const SizedBox(height: 12),
                                 TextField(
@@ -125,7 +131,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   keyboardType: TextInputType.emailAddress,
                                   decoration: InputDecoration(
                                     hintText: 'Enter corporate email',
-                                    prefixIcon: const Icon(Icons.badge_outlined),
+                                    prefixIcon: const Icon(
+                                      Icons.badge_outlined,
+                                    ),
                                     filled: true,
                                     fillColor: colorScheme.surface,
                                     border: OutlineInputBorder(
@@ -137,10 +145,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                 const SizedBox(height: 24),
                                 Text(
                                   'ACCESS TOKEN',
-                                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: Theme.of(context).textTheme.labelSmall
+                                      ?.copyWith(
+                                        color: colorScheme.onSurfaceVariant,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                 ),
                                 const SizedBox(height: 12),
                                 TextField(
@@ -157,17 +166,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ),
                                 ),
-                                
+
                                 const SizedBox(height: 32),
-                                
+
                                 // Action Button
                                 SizedBox(
                                   width: double.infinity,
                                   height: 56,
                                   child: ElevatedButton(
-                                    onPressed: isLoading 
-                                      ? null 
-                                      : () => context.read<AuthCubit>().login(
+                                    onPressed: isLoading
+                                        ? null
+                                        : () => context.read<AuthCubit>().login(
                                             _emailController.text,
                                             _passwordController.text,
                                           ),
@@ -180,37 +189,44 @@ class _LoginScreenState extends State<LoginScreen> {
                                       elevation: 0,
                                     ),
                                     child: isLoading
-                                      ? const SizedBox(
-                                          height: 20,
-                                          width: 20,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      : const Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'AUTHORIZE ACCESS',
-                                              style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.1),
+                                        ? const SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
                                             ),
-                                            SizedBox(width: 8),
-                                            Icon(Icons.vpn_key, size: 18),
-                                          ],
-                                        ),
+                                          )
+                                        : const Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                'AUTHORIZE ACCESS',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  letterSpacing: 1.1,
+                                                ),
+                                              ),
+                                              SizedBox(width: 8),
+                                              Icon(Icons.vpn_key, size: 18),
+                                            ],
+                                          ),
                                   ),
                                 ),
                               ],
                             );
-                          }
+                          },
                         ),
                       ),
-                      
+
                       const SizedBox(height: 48),
                       // Security Pill
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.green.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(30),
@@ -218,7 +234,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.shield, color: Colors.green, size: 14),
+                            const Icon(
+                              Icons.shield,
+                              color: Colors.green,
+                              size: 14,
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               'ENCRYPTED SYNC ACTIVE',
@@ -236,7 +256,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       Text(
                         'v2.4.0-PRO-FIELD',
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                          color: colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.5,
+                          ),
                         ),
                       ),
                     ],

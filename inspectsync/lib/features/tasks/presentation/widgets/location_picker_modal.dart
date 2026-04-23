@@ -90,7 +90,7 @@ class _LocationPickerModalState extends State<LocationPickerModal> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           Padding(
             padding: const EdgeInsets.all(24),
             child: Row(
@@ -111,7 +111,9 @@ class _LocationPickerModalState extends State<LocationPickerModal> {
                     const SizedBox(height: 4),
                     Text(
                       'Select Mission Site',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
@@ -124,83 +126,100 @@ class _LocationPickerModalState extends State<LocationPickerModal> {
           ),
 
           Expanded(
-            child: _isLoading 
-              ? const Center(child: CircularProgressIndicator())
-              : Stack(
-                  children: [
-                    FlutterMap(
-                      mapController: _mapController,
-                      options: MapOptions(
-                        initialCenter: _pickedLocation!,
-                        initialZoom: 15,
-                        onTap: (tapPosition, point) {
-                          setState(() => _pickedLocation = point);
-                        },
-                      ),
-                      children: [
-                        TileLayer(
-                          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          userAgentPackageName: 'com.inspectsync.app',
-                          tileBuilder: (context, tileWidget, tile) {
-                            return ColorFiltered(
-                              colorFilter: const ColorFilter.matrix([
-                                -1.0, 0.0, 0.0, 0.0, 255.0,
-                                0.0, -1.0, 0.0, 0.0, 255.0,
-                                0.0, 0.0, -1.0, 0.0, 255.0,
-                                0.0, 0.0, 0.0, 1.0, 0.0,
-                              ]),
-                              child: tileWidget,
-                            );
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Stack(
+                    children: [
+                      FlutterMap(
+                        mapController: _mapController,
+                        options: MapOptions(
+                          initialCenter: _pickedLocation!,
+                          initialZoom: 15,
+                          onTap: (tapPosition, point) {
+                            setState(() => _pickedLocation = point);
                           },
                         ),
-                        if (_pickedLocation != null)
-                          MarkerLayer(
-                            markers: [
-                              Marker(
-                                point: _pickedLocation!,
-                                width: 40,
-                                height: 40,
-                                child: Icon(
-                                  Icons.location_on,
-                                  color: colorScheme.primary,
-                                  size: 40,
-                                ),
-                              ),
-                            ],
+                        children: [
+                          TileLayer(
+                            urlTemplate:
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            userAgentPackageName: 'com.inspectsync.app',
+                            tileBuilder: (context, tileWidget, tile) {
+                              return ColorFiltered(
+                                colorFilter: const ColorFilter.matrix([
+                                  -1.0,
+                                  0.0,
+                                  0.0,
+                                  0.0,
+                                  255.0,
+                                  0.0,
+                                  -1.0,
+                                  0.0,
+                                  0.0,
+                                  255.0,
+                                  0.0,
+                                  0.0,
+                                  -1.0,
+                                  0.0,
+                                  255.0,
+                                  0.0,
+                                  0.0,
+                                  0.0,
+                                  1.0,
+                                  0.0,
+                                ]),
+                                child: tileWidget,
+                              );
+                            },
                           ),
-                      ],
-                    ),
-                    
-                    // Crosshair overlay
-                    IgnorePointer(
-                      child: Center(
-                        child: Icon(
-                          Icons.add,
-                          color: colorScheme.primary.withValues(alpha: 0.5),
-                          size: 32,
+                          if (_pickedLocation != null)
+                            MarkerLayer(
+                              markers: [
+                                Marker(
+                                  point: _pickedLocation!,
+                                  width: 40,
+                                  height: 40,
+                                  child: Icon(
+                                    Icons.location_on,
+                                    color: colorScheme.primary,
+                                    size: 40,
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+
+                      // Crosshair overlay
+                      IgnorePointer(
+                        child: Center(
+                          child: Icon(
+                            Icons.add,
+                            color: colorScheme.primary.withValues(alpha: 0.5),
+                            size: 32,
+                          ),
                         ),
                       ),
-                    ),
-                    
-                    // My Location Button
-                    Positioned(
-                      bottom: 24,
-                      right: 24,
-                      child: FloatingActionButton(
-                        mini: true,
-                        backgroundColor: colorScheme.surface,
-                        foregroundColor: colorScheme.primary,
-                        onPressed: () async {
-                          final pos = await Geolocator.getCurrentPosition();
-                          final point = LatLng(pos.latitude, pos.longitude);
-                          _mapController.move(point, 15);
-                          setState(() => _pickedLocation = point);
-                        },
-                        child: const Icon(Icons.my_location),
+
+                      // My Location Button
+                      Positioned(
+                        bottom: 24,
+                        right: 24,
+                        child: FloatingActionButton(
+                          mini: true,
+                          backgroundColor: colorScheme.surface,
+                          foregroundColor: colorScheme.primary,
+                          onPressed: () async {
+                            final pos = await Geolocator.getCurrentPosition();
+                            final point = LatLng(pos.latitude, pos.longitude);
+                            _mapController.move(point, 15);
+                            setState(() => _pickedLocation = point);
+                          },
+                          child: const Icon(Icons.my_location),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
           ),
 
           // Action Bar
@@ -235,17 +254,24 @@ class _LocationPickerModalState extends State<LocationPickerModal> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: _pickedLocation == null ? null : () {
-                      Navigator.pop(context, _pickedLocation);
-                    },
+                    onPressed: _pickedLocation == null
+                        ? null
+                        : () {
+                            Navigator.pop(context, _pickedLocation);
+                          },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primary,
                       foregroundColor: colorScheme.onPrimary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
                     ),
                     child: const Text(
                       'CONFIRM SITE SELECTION',
-                      style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.0),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.0,
+                      ),
                     ),
                   ),
                 ),

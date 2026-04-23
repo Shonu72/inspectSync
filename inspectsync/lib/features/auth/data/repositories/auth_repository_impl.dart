@@ -15,10 +15,7 @@ class AuthRepositoryImpl implements IAuthRepository {
   UserEntity? _currentUser;
   String? _token;
 
-  AuthRepositoryImpl({
-    required this.remoteDataSource,
-    required this.storage,
-  });
+  AuthRepositoryImpl({required this.remoteDataSource, required this.storage});
 
   @override
   UserEntity? get currentUser => _currentUser;
@@ -32,7 +29,10 @@ class AuthRepositoryImpl implements IAuthRepository {
   static const String _tokenKey = 'token';
 
   @override
-  Future<Either<Failure, UserEntity>> login(String email, String password) async {
+  Future<Either<Failure, UserEntity>> login(
+    String email,
+    String password,
+  ) async {
     try {
       final response = await remoteDataSource.login(email, password);
       await _saveAuthData(response.user, response.token);
